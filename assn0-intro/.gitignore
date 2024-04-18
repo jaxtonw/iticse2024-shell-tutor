@@ -1,0 +1,8 @@
+lesson?
+.[0-7]*-*.sh
+certificate.txt
+shell-logs.zip
+shell-logs.tgz
+*.sw[pon]
+*~
+.logr

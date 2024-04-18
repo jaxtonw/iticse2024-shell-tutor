@@ -1,0 +1,65 @@
+ ooooooooooooooooooooooooooooooooooooo
+ 8                                .d88
+ 8  oooooooooooooooooooooooooooood8888
+ 8  8888888888888888888888888P"   8888
+ 8  8888888888888888888888P"      8888
+ 8  8888888888888888888P"         8888
+ 8  8888888888888888P"            8888
+ 8  8888888888888P"               8888
+ 8  8888888888P"                  8888
+ 8  8888888P"                     8888
+ 8  8888P"                        8888
+ 8  8888oooooooooooooooooooooocgmm8888
+ 8 .od88888888888888888888888888888888
+ 8888888888888888888888888888888888888
+
+    ooooooooooooooooooooooooooooooo
+   d                       ...oood8b
+  d              ...oood888888888888b
+ d     ...oood88888888888888888888888b
+dood8888888888888888888888888888888888b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+${_W}oooooooooooooooooooooooooooooo${_Z}
+${_W}8                          .d8${_Z}
+${_W}8  ${_g}oooooooooooooooooooooooo${_W}888${_Z}
+${_W}8  ${_g}888888888888888888888888${_W}888${_Z}   The Unix command shell lets you talk to
+${_W}8  ${_g}8888888888888888888888P"${_W}888${_Z}   your computer through a small, simple
+${_W}8  ${_g}8888888888888888888P"   ${_W}888${_Z}   programming language.
+${_W}8  ${_g}8888888888888888P"      ${_W}888${_Z}
+${_W}8  ${_g}8888888888888P"         ${_W}888${_Z}   In contrast to other languages you have
+${_W}8  ${_g}8888888888P"            ${_W}888${_Z}   used, the Unix shell prioritizes
+${_W}8  ${_g}8888888P"               ${_W}888${_Z}   $(bld interactive) use above writing programs.
+${_W}8  ${_g}8888P"                  ${_W}888${_Z}
+${_W}8  8888oooooooooooooooo${_R}c${_G}g${_B}mm${_W}888${_Z}
+${_W}8 .od8888888888888888888888888${_Z}   Concessions were made to ensure it is
+${_W}888888888888888888888888888888${_Z}   easy to type:
+${_W}                              ${_Z}
+${_W}    oooooooooooooooooooooo    ${_Z}     * Commands have $(bld short names)
+${_W}   d               ..oood8b   ${_Z}     * $(bld Minimal) punctuation is required
+${_W}  d         ..oood888888888b  ${_Z}     * Only $(bld one type) of data (string)
+${_W} d   ..oood88888888888888888b ${_Z}
+${_W}dood8888888888888888888888888b${_Z}

@@ -1,0 +1,2 @@
+# Always check out shell scripts with Unix-style line-endings
+*.sh  text eol=lf
