@@ -24,6 +24,103 @@ $ cd assn0-intro
 $ ./tutorial.sh
 ```
 
+## Special Instructions For **macOS** Users
+
+### How to open the Terminal app
+
+0.  Press `Command + Space` to open Spotlight Search
+1.  Type `terminal` into the search window and click the entry with black square icon
+
+
+### Default interactive shell message
+
+The first time you open the Terminal app you may see this message:
+
+```
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+```
+
+If this happens to you, run the command as instructed.  You will be prompted to enter your password:
+
+```bash
+$ chsh -s /bin/zsh
+Changing shell for fadein.
+Password for fadein:
+```
+
+Finally, close and re-open the Terminal app.
+
+
+### Installing `git` and `python3`
+
+If you haven't yet installed the command line developer tools, you will be greeted by a pop up asking you to install them the first time you try to run `git` or `python3`.  Just click `Install`, accept the license, and you're off to the races.
+
+
+### Keyboard shortcuts
+
+Keyboard shortcuts are introduced in the lesson **4-projects.sh** which use both the `Control` and `Option` keys.  By default, `Option` does not do what is needed.  Follow these steps to set it up:
+
+*   Launch the Terminal app
+*   Open the `Terminal` menu and select `Preferences`
+*   Select the `Profiles` page
+*   Select the `Keyboard` tab
+*   Check 'Use Option as Meta Key'
+
+You do not need to restart the Terminal app for this setting to take effect.
+
+
+## Special Installation Instructions For **Git for Windows** Users
+
+**Not to be confused with _Windows Subsystem For Linux (WSL)_.  CS 1440 students should use Git for Windows instead of WSL.**
+
+
+### Installing Git for Windows
+
+*CS 1440 students: there is a video on Canvas that walks you through this process*
+
+0.  Visit [https://gitforwindows.org/](https://gitforwindows.org/)
+1.  Click the **Download** button
+2.  Locate and run the installer
+3.  You will be presented with several options.  By and large you should keep the defaults, but keep a close eye out for these ones:
+    *   *Choosing the default editor used by Git*
+        -   Select the Nano editor, which is at the very top of the drop-down list (scroll up to see it)
+    *   *Choose a credential helper*
+        -   Select `None`
+    *   *Configuring experimental options*
+        -   Enable experimental support for pseudo consoles
+4.  If you missed one of these options, re-run the installer to try again
+
+
+### How To Open The Git+Bash Terminal
+
+There are two ways to open the terminal:
+
+0.  Press the Windows key or click the Start menu, then type "Git Bash" to locate the app
+1.  Right-click the desktop or a folder and select "Open Git Bash here" from the menu
+
+
+### Installing the Unix Manual
+
+Beginning with lesson **1-commands.sh**, the Unix manual becomes an important part of the tutorial.  Git for Windows doesn't come with the manual, so I prepared an installer for you.
+
+0.  Download this file: [install-man-pages-1.sh](https://raw.githubusercontent.com/jaxtonw/iticse2024-shell-tutor/a3068ffe8581b86fabc20660cd9f792bb3798a70/install-man-pages-1.sh)
+1.  Note where this file was saved on your computer
+2.  Open a new Git Bash terminal as an *Administrator* (right-click the Git+Bash icon and choose "Run as Administrator", or select that option from the Start menu)
+    *   When prompted "Do you want to allow this app to make changes to your device?", click **Yes**
+    *   This may open the shell into a location outside of your home directory.  Navigate to the directory where you downloaded the installer a few moments ago
+    *   First run the `cd` command by itself to take you to your home directory
+    *   Then run `cd` again with the name of the folder that contains the installer, ex: `cd Downloads`
+3.  Run the installer with this command: `sh install-man-pages-1.sh`
+    *   After this program completes, the Bash terminal opened as Administrator may be closed
+4.  Open a new Bash terminal to verify that the manual was installed
+    *   Run `man ls`; the test is successful when information about the `ls` command appears
+    *   Press `q` to quit the man page viewer
+    *   Seek help if you see the message `bash: man: command not found`
+
+
+
 
 # Provided Shell Tutor Assignments
 
