@@ -6,3 +6,5 @@ certificate.txt
 .logr
 shell-logs.tgz
 shell-logs.zip
+install-man-pages-1.sh
+
