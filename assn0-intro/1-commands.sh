@@ -32,7 +32,7 @@ _man_not_found() {
 
 			If this error persists, contact $_EMAIL
 			MNF
-_tutr_open 'https://gitlab.cs.usu.edu/erik.falor/shell-tutor#installing-the-unix-manual'
+_tutr_open 'https://github.com/jaxtonw/iticse2024-shell-tutor/blob/main/README.md#installing-the-unix-manual'
 			;;
 		*)
 		cat <<-MNF

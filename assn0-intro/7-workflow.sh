@@ -9,17 +9,17 @@ PATH=$PWD/.lib:$PATH
 
 # The assignment number of the next assignment
 _A=0
-
+USING_GITHUB=0
 # Name of the starter code repo
 _REPONAME=cs1440-assn$_A
-_REPONAME_L=cs1440-falor-erik-assn$_A
+_REPONAME_L=cs1440-winder-jaxton-assn$_A
 
 source ansi-terminal-ctl.sh
 # This function is named `_Git` to avoid clashing with Zsh's `_git`
 _Git() { (( $# == 0 )) && echo $(blu Git) || echo $(blu $*); }
 _local() { (( $# == 0 )) && echo $(ylw local) || echo $(ylw $*); }
 _remote() { (( $# == 0 )) && echo $(cyn remote) || echo $(cyn $*); }
-_GitLab() { (( $# == 0 )) && echo $(cyn GitLab) || echo $(cyn $*); }
+_GitLab() { (( $# == 0 )) && echo $(cyn GitHub) || echo $(cyn $*); }
 _origin() { (( $# == 0 )) && echo $(red origin) || echo $(red $*); }
 _md() { (( $# == 0 )) && echo $(blu Markdown) || echo $(blu $*) ; }
 _code() { (( $# == 0 )) && echo $(cyn code) || echo $(cyn "$*"); }
@@ -84,11 +84,11 @@ _repo_bad_origin() {
 
 }
 
-_origin_not_eriks() {
-	(( $# != 1 )) && _tutr_die echo Usage: _origin_not_eriks DIRECTORY
+_origin_not_instructor() {
+	(( $# != 1 )) && _tutr_die echo Usage: _origin_not_instructor DIRECTORY
 	( # create a sub shell to not leave the tutorial in the wrong PWD
 		cd "$1"
-		[[ $(git remote get-url origin) != *erik.falor* ]]
+		[[ $(git remote get-url origin) != *jaxtonw* ]]
 	)
 }
 
@@ -142,19 +142,30 @@ setup() {
 	local _SHORT="$_PARENT/$_REPONAME"
 	export _REPO="$_SHORT"
 
+	# If the repo doesn't exist at the parent, check the parent's parent ../.. and adjust as necessary
+	if [[ ! -d "$_LONG/.git" && ! -d "$_SHORT/.git" ]]; then
+		_PARENT_PARENT="$(cd ../.. && pwd)"
+		if [[ -d "$_PARENT_PARENT/$_REPONAME_L/.git" || -d "$_PARENT_PARENT/$_REPONAME/.git" ]]; then
+			export _PARENT=$_PARENT_PARENT
+			local _LONG="$_PARENT/$_REPONAME_L"
+			local _SHORT="$_PARENT/$_REPONAME"
+			export _REPO="$_SHORT"
+		fi
+	fi
+
 	# Bail out unless the last lesson was completed AND the starter code
 	# repo exists AND has an 'origin' that DOES NOT point back to my account
 	# Otherwise, note where that repo is located
-	if [[ ! -d "$_LONG/.git" && ! -d "$_SHORT/.git" ]]; then
-		_tutr_die _repo_missing
-	elif [[ -d "$_SHORT/.git" ]]; then
-		if ! _origin_not_eriks "$_SHORT"; then
+	if [[ -d "$_SHORT/.git" ]]; then
+		if ! _origin_not_instructor "$_SHORT"; then
 			_tutr_die _repo_bad_origin "$_SHORT"
 		fi
 	elif [[ -d "$_LONG/.git" ]]; then
-		if ! _origin_not_eriks "$_LONG"; then
+		if ! _origin_not_instructor "$_LONG"; then
 			_tutr_die _repo_bad_origin "$_LONG"
 		fi
+	else
+		_tutr_die _repo_missing
 	fi
 
 	if   which python &>/dev/null && [[ $(python -V 2>&1) = "Python 3"* ]]; then
@@ -276,7 +287,7 @@ cd_repo_ff() {
 cd_repo_prologue() {
 	if [[ $PWD == $_BASE ]]; then
 		cat <<-:
-		Change into the starter code repository at $(path ../$(basename "$_REPO"))
+		Change into the starter code repository at $(path $(_tutr_shortest_path $_REPO $PWD [echo]))
 		:
 	else
 		cat <<-:
@@ -854,36 +865,43 @@ push_readme_hint() {
 push_readme_epilogue() {
 	_tutr_pressenter
 
-	cat <<-':'
+	if [[ $USING_GITHUB != 0 ]]; then
+		cat <<-':'
 
-	Always watch for the receipt that is printed after you push:
+		Always watch for the receipt that is printed after you push:
 
-	***********************************************************************
-	*           __  ________  __  _____                ____    _          *
-	*          / / / / __/ / / / / ___/__  __ _  ___  / __/___(_)         *
-	*         / /_/ /\ \/ /_/ / / /__/ _ \/  ' \/ _ \_\ \/ __/ /          *
-	*         \____/___/\____/  \___/\___/_/_/_/ .__/___/\__/_/           *
-	*                                         /_/                         *
-	*  ,/         \,                                                      *
-	* ((__,-"""-,__))                                                     *
-	*  `--)~   ~(--`                                                      *
-	* .-'(       )'-,                                                     *
-	* `--`d\   /b`--`  Big Blue says:                                     *
-	*     |     |                                                         *
-	*     (6___6)  Your submission arrived Sat 16 Jul 2022 18:39:59 MDT   *
-	*      `---`                                                          *
-	*                                                                     *
-	***********************************************************************
+		***********************************************************************
+		*           __  ________  __  _____                ____    _          *
+		*          / / / / __/ / / / / ___/__  __ _  ___  / __/___(_)         *
+		*         / /_/ /\ \/ /_/ / / /__/ _ \/  ' \/ _ \_\ \/ __/ /          *
+		*         \____/___/\____/  \___/\___/_/_/_/ .__/___/\__/_/           *
+		*                                         /_/                         *
+		*  ,/         \,                                                      *
+		* ((__,-"""-,__))                                                     *
+		*  `--)~   ~(--`                                                      *
+		* .-'(       )'-,                                                     *
+		* `--`d\   /b`--`  Big Blue says:                                     *
+		*     |     |                                                         *
+		*     (6___6)  Your submission arrived Sat 16 Jul 2022 18:39:59 MDT   *
+		*      `---`                                                          *
+		*                                                                     *
+		***********************************************************************
 
-	:
-	_tutr_pressenter
+		:
+		_tutr_pressenter
 
 	cat <<-:
+	cat <<-:
 
-	If you $(bld "don't") see this receipt, there is a possibility that you have
-	pushed your code to $(bld another Git server) (students have done this before).
-	If I can't find your code on my sever, $(bld "I can't grade it").
+		cat <<-:
 
+		If you $(bld "don't") see this receipt, there is a possibility that you have
+		pushed your code to $(bld another Git server) (students have done this before).
+		If I can't find your code on my sever, $(bld "I can't grade it").
+		
+		:
+	fi
+	cat <<-:
 	Assignments are due before $(bld midnight) as judged by the clock on $(bld this)
 	$(_GitLab) server.  It doesn't matter if it is running faster than the clock
 	on your laptop, your microwave, your phone, or the official atomic clock
@@ -1780,10 +1798,16 @@ big_push_hint() {
 
 big_push_epilogue() {
 	_tutr_pressenter
-	cat <<-:
+	
+	if [[ $USING_GITHUB != 0 ]]; then
+		cat <<-:
 
-	Whenever you push to my $(_GitLab) server, $(bld always) check for the push receipt
-	that shows $(blu Big Blue) and the arrival time.
+		Whenever you push to my $(_GitLab) server, $(bld always) check for the push receipt
+		that shows $(blu Big Blue) and the arrival time.
+		:
+	fi
+	
+	cat <<-:
 
 	This is also a good opportunity to refresh your browser and make sure
 	that your latest commit arrived, as expected.

@@ -62,7 +62,7 @@ _python_not_found() {
 	I could not find a working Python 3 interpreter on your computer.
 	It is required for this lesson.
 
-	Contact erik.falor@usu.edu for help
+	Contact jaxton.winder@gmail.com for help
 	PNF
 }
 

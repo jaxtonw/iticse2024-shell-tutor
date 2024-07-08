@@ -739,7 +739,13 @@ put_key_on_gitlab_prologue() {
 
 put_key_on_gitlab_test() {
 	local pattern="^ssh -T git@$_GL$|^ssh git@$_GL -T$"
-	if   [[ ${_CMD[@]} =~ $pattern ]] && (( $_RES == 0 )); then return 0
+	local gh_pattern="^ssh -T git@github*$|^ssh git@github* -T$"
+
+	if   [[ ${_CMD[@]} =~ $pattern ]]; then 
+		if (( $_RES == 0 )); then return 0
+		# GitHub returns 1 when a key is found, but shell access it not granted
+		elif [[ ${_CMD[@]} =~ $gh_pattern ]] && (( $_RES == 1 )); then return 0 
+		fi
 	elif [[ ${_CMD[@]} =~ $pattern ]]; then
 		(( ++_FAILS ))
 		return $STATUS_FAIL

@@ -11,7 +11,7 @@ PATH=$PWD/.lib:$PATH
 _A=0
 
 # Name of the starter code repo
-_REPONAME=cs1440-falor-erik-assn$_A
+_REPONAME=cs1440-winder-jaxton-assn$_A
 
 # This function is named `_Git` to avoid clashing with Zsh's `_git`
 _Git() { (( $# == 0 )) && echo $(blu Git) || echo $(blu $*); }
@@ -35,7 +35,7 @@ if [[ -n $_TUTR ]]; then
 	_origin() { (( $# == 0 )) && echo $(red origin) || echo $(red $*); }
 
 	# origin of the starter code repo
-	_SSH_REPO_URL=git@gitlab.cs.usu.edu:erik.falor/$_REPONAME
+	_SSH_REPO_URL=git@github.com:jaxtonw/$_REPONAME
 
 	# Open the current Git repo's origin web page
 	browse_repo() {
@@ -105,7 +105,12 @@ setup() {
 	export _BASE="$PWD"
 	# Because I can't count on GNU Coreutils realpath(1) or readlink(1) on
 	# all systems, get parent dir's real name the old fashioned way
-	export _PARENT=$(cd .. && pwd)
+	export _PARENT="$(cd .. && pwd)"
+	# Handle the case where we're in a repo in a repo; like the case that we're
+	# in the dev repo or a packaged shell tutor distribution repo  
+	if (cd $_PARENT; git status &>/dev/null); then
+		export _PARENT="$(cd ../.. && pwd)"
+	fi
 	export _REPO=$_PARENT/$_REPONAME
 
 	# Exit if the starter code repo already exists
@@ -494,7 +499,11 @@ cd_dotdot0_ff() {
 
 # 4. cd .. to escape this git repository
 cd_dotdot0_prologue() {
-	echo Go up and out of this directory.
+	cat <<: 
+Go up and out of this directory to $(path $_PARENT)
+
+You may use $(path $(_tutr_shortest_path $_PARENT $PWD [echo])) to get there
+:
 }
 
 cd_dotdot0_test() {
@@ -626,7 +635,7 @@ git_clone_prologue() {
 }
 
 git_clone_test() {
-	_tutr_generic_test -c git -a clone -a "^https://gitlab.cs.usu.edu/erik.falor/cs1440-falor-erik-assn$_A$|^git@gitlab.cs.usu.edu:erik.falor/cs1440-falor-erik-assn$_A$" -d "$_PARENT"
+	_tutr_generic_test -c git -a clone -a "^https://github.com/jaxtonw/cs1440-winder-jaxton-assn$_A$|^git@github.com:jaxtonw/cs1440-winder-jaxton-assn$_A$" -d "$_PARENT"
 }
 
 git_clone_hint() {
@@ -654,7 +663,7 @@ git_clone_hint() {
 			cat <<-:
 
 			To clone this repo run
-			  $(cmd git clone git@gitlab.cs.usu.edu:erik.falor/$_REPONAME)
+			  $(cmd git clone git@github.com:jaxtonw/$_REPONAME)
 			:
 		;;
 	esac
@@ -673,7 +682,7 @@ git_clone_epilogue() {
 		cat <<-:
 		Hmm... something went wrong while cloning that repository.
 
-		Copy the text in the terminal and prepare a bug report for Erik.
+		Copy the text in the terminal and prepare a bug report for Jaxton.
 		:
 	fi
 }
@@ -1425,7 +1434,7 @@ git_remote_v_prologue() {
 	mine by running
 	  $(cmd git remote -v)
 
-	Try it!  Look for my username ($(cyn erik.falor)) in the URL that is printed.
+	Try it!  Look for my username ($(cyn jaxtonw)) in the URL that is printed.
 	:
 }
 
@@ -1604,7 +1613,7 @@ git_remote_add_rw() {
 }
 
 git_remote_add_ff() {
-	git remote add origin git@gitlab.cs.usu.edu:chad/cs1440-chadwick-chad-assn$_A
+	git remote add origin git@github.com:chad/cs1440-chadwick-chad-assn$_A
 }
 
 git_remote_add_prologue() {
@@ -1625,9 +1634,9 @@ git_remote_add_prologue() {
 
 	Your new URL will look like that, except for these differences:
 
-	  * Replace $(cyn erik.falor) with your $(bld GitLab username) (case does not matter)
+	  * Replace $(cyn jaxtonw) with your $(bld GitLab username) (case does not matter)
 	    * Your $(bld GitLab username) is most likely your $(bld A Number)
-	  * Replace $(cyn falor-erik) with your $(bld real name) (again, case does not matter)
+	  * Replace $(cyn winder-jaxton) with your $(bld real name) (again, case does not matter)
 	    * To make things easy on your grader, use your Canvas $(bld preferred name)
 
 	:
@@ -1652,7 +1661,7 @@ git_remote_add_prologue() {
 	When entering the URL, it is very important that you NOT change:
 
 	  * Punctuation, such as slashes $(ylw /) and colons $(ylw :)
-	  * $(ylw git@gitlab.cs.usu.edu)
+	  * $(ylw git@gitlab.cs.usu.edu OR git@github.com)
 	  * $(ylw cs1440)
 	  * $(ylw assn$_A)
 
@@ -1693,14 +1702,16 @@ git_remote_add_test() {
 	if   [[ -z $URL ]]; then return 99
 	elif [[ $URL =  https:* ]]; then return $_HTTPS_URL
 	elif [[ $URL != git@* ]]; then return $_NOT_SSH_URL
-	elif [[ $URL =  git@gitlab.cs.usu.edu/* ]]; then return 94
-	elif [[ $URL != *gitlab.cs.usu.edu* ]]; then return 93
-	elif [[ $URL =  *:erik.falor/* ]]; then return 98
+	elif [[ $URL =  git@gitlab.cs.usu.edu/* || $URL =  git@github.com/*  ]]; then return 94
+	elif ! [[ $URL == *gitlab.cs.usu.edu* || $URL == *github.com* ]]; then return 93
+	elif [[ $URL =  *:jaxtonw/* ]]; then return 98
 	elif [[ $URL != */cs1440-* ]]; then return 92
 	elif [[ $URL != *-assn$_A && $URL != *-assn$_A.git ]]; then return 96
 	elif [[ $URL =  */$_REPONAME* ]]; then return 97
 	elif [[ $URL =  git@gitlab.cs.usu.edu:*/cs1440-*-assn$_A ||
-		    $URL =  git@gitlab.cs.usu.edu:*/cs1440-*-assn$_A.git ]]; then return 0
+		    $URL =  git@gitlab.cs.usu.edu:*/cs1440-*-assn$_A.git ||
+			$URL =  git@github.com:*/cs1440-*-assn$_A ||
+			$URL =  git@github.com:*/cs1440-*-assn$_A.git ]]; then return 0
 	else _tutr_generic_test -c git -n -d "$_REPO"
 	fi
 }
@@ -1749,8 +1760,8 @@ git_remote_add_hint() {
 		94)
 			cat <<-:
 			This SSH address will not work because there is a slash $(bld "'/'") between the
-			hostname $(ylw gitlab.cs.usu.edu) and your username.  (Use $(cmd git remote -v) to
-			see for yourself).
+			hostname $(ylw gitlab.cs.usu.edu OR github.com) and your username.  
+			(Use $(cmd git remote -v) to see for yourself).
 
 			Instead of a slash that character should be a colon $(bld "':'")
 
@@ -1760,7 +1771,7 @@ git_remote_add_hint() {
 
 		93)
 			cat <<-:
-			The hostname of the URL should be $(ylw gitlab.cs.usu.edu).
+			The hostname of the URL should be $(ylw gitlab.cs.usu.edu OR github.com).
 
 			If you push your code to the wrong Git server it will not be submitted.
 
@@ -1881,15 +1892,50 @@ git_push_all_prologue() {
 	Afterward, you can leave off $(cmd "-u origin --all") from the $(cmd push)
 	subcommand (because $(bld lazy)).
 	:
+
+	local URL=$(git remote get-url origin 2>/dev/null)
+	if [[ $URL == *"github.com"* ]]; then
+		github_push_prepare_instructions
+	fi
 }
 
+github_push_prepare_instructions() {
+	local URL=$(git remote get-url origin 2>/dev/null)
+	REPO_NAME=${URL%.git}
+	REPO_NAME=${URL##*/}
+
+	cat <<-:
+	
+	Because you are using GitHub, you must first create the repository online.
+
+	Go to $(path https://github.com/new) and create a repository with the following:
+
+	* Repository name: $(ylw $REPO_NAME)
+	* 'Add a README' is $(bld UNCHECKED)
+	* $(bld NO) repository template
+	* $(bld .gitignore template: None)
+	* $(bld License: None)
+
+	I will open a web browser for you to this page.
+
+	After you have done this, come back to the Shell Tutor, and you may push your work.
+	:
+	_tutr_open 'https://github.com/new'
+
+}
 git_push_all_test() {
 	_NO_U=99
+	_GH_NOT_CREATED=128
 	if   [[ ${_CMD[@]} = 'git help push' ]]; then return $NOOP
 	elif [[ ${_CMD[@]} = 'git remote' ]]; then return $NOOP
 	elif [[ ${_CMD[@]} = 'git remote -v' ]]; then return $NOOP
 	elif (( _RES == 0 )) && [[ ${_CMD[@]} = 'git push'* && ${_CMD[@]} != *'-u'* ]]; then return $_NO_U
 	elif (( _RES == 0 )) && [[ ${_CMD[@]} = 'git push -u origin master' ]]; then return 0
+	# Pushed to GitHub, repo not created on GitHub
+	elif (( _RES == 128 )) && [[ 
+		$(git remote get-url origin 2>/dev/null) == *"github.com"* &&
+		${_CMD[@]} = 'git push'* &&
+		${_CMD[@]} = *'origin'* ]]; then return $_GH_NOT_CREATED 
 	else _tutr_generic_test -c git -a push -a -u -a origin -a --all -d "$_REPO"
 	fi
 }
@@ -1941,6 +1987,13 @@ git_push_all_hint() {
 			:
 			;;
 
+		$_GH_NOT_CREATED)
+			github_push_prepare_instructions
+			cat <<-:
+			Setup your repository on GitHub, then run this command to proceed
+			  $(cmd git push -u origin --all)
+			:
+			;;
 		*)
 			_tutr_generic_hint $1 git "$_REPO"
 			cat <<-:

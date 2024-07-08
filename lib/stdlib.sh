@@ -1,7 +1,7 @@
 # vim: set expandtab tabstop=4 shiftwidth=4:
 
 # Contact for bug reports
-typeset -r _EMAIL=$'\x1b[1;36merik.falor@usu.edu\x1b[0m'
+typeset -r _EMAIL=$'\x1b[1;36mjaxton.winder@gmail.com\x1b[0m'
 
 # Exit code indicating the lesson was completed successfully
 typeset -r _COMPLETE=7

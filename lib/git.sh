@@ -160,6 +160,7 @@ typeset -r _GB_BEHIND=2
 # Store the number of commits the current branch is ahead/behind in $REPLY
 _git_branch_status() {
 	git status --branch --porcelain=v1 | {
+		echo $SHLVL
 		local stat=0 line
 		while IFS=$'\n' read line; do
 			if [[ $line == "## "*...*/* ]]; then

@@ -1,7 +1,7 @@
-typeset -r _GL=gitlab.cs.usu.edu
-typeset -r _GL_HOSTKEY_ED25519=SHA256:tIjwsWWEm+4NppPonV2Fkqe252DJqLWEJ5ygaAHbs2o
-typeset -r _GL_HOSTKEY_ECDSA=SHA256:4x+G97yflra4K2KWnF19ZNrZGL1iqjQaq8HVwu/mX6U
-typeset -r _HTTPS_GITLAB_KEYS=https://$_GL/-/profile/keys
+typeset -r _GL=github.com
+typeset -r _GL_HOSTKEY_ED25519=SEE_NOTE_ABOVE
+typeset -r _GL_HOSTKEY_ECDSA=SEE_NOTE_ABOVE
+typeset -r _HTTPS_GITLAB_KEYS=https://$_GL/setings/keys
 export _GL_USERNAME
 
 
@@ -12,10 +12,10 @@ export _GL_USERNAME
 _ssh_key_exists_msg() {
 	cat <<-MSG
 	I found an SSH key named $(path $(basename $1)) under $(path ~/.ssh),
-	but was unable to login to GitLab.
+	but was unable to login to GitHub.
 
 	${_Y} 8 8 8 8               ,ooo.    ${_Z}Re-create your key with $(cmd ssh-keygen), add
-	${_Y} 8a8 8a8              oP   ?b   ${_Z}add it to your GitLab profile on
+	${_Y} 8a8 8a8              oP   ?b   ${_Z}add it to your GitHub profile on
 	${_Y}d888a888zzzzzzzzzzzzzz8     8b  ${_C}${_u}$_HTTPS_GITLAB_KEYS${_Z},
 	${_Y} '""^""'              ?o___oP'  ${_Z}then restart this lesson.
 
@@ -48,9 +48,14 @@ _ssh_add_hostkey_msg() {
 	cat <<-:
 	Checking connection to $(cyn $_GL)...
 
-	Upon your first connection to $(ylw "DuckieCorp's") GitLab server from this
+	Upon your first connection to $(ylw "DuckieCorp's") GitHub server from this
 	device, you must verify that you're linking to the $(bld real) server and
 	not an imposter.
+
+	$(bld NOTE: With this being a simulation of the Shell Tutor not hosted through)
+	$(bld the USU GitLab server, THESE KEYS WILL NOT MATCH)
+
+	$(bld IMPORTANT: Ignore these instructions and type 'yes') 
 
 	Look for the fingerprint in a line of text that begins as one of these:
 	  $(bld ED25519 key fingerprint is  ${_GL_HOSTKEY_ED25519:0:7}...)
@@ -102,7 +107,7 @@ _unable_to_determine_username() {
 
 	${_Y}     .-""""""-.      ${_Z}
 	${_Y}   .'          '.    ${_Z}
-	${_Y}  /   ${_W}O      O   ${_Y}\   ${_Z} I was unable to determine your username on GitLab
+	${_Y}  /   ${_W}O      O   ${_Y}\   ${_Z} I was unable to determine your username on GitHub
 	${_Y} :           ${_B}'   ${_Y} :  ${_Z}
 	${_Y} |                |  ${_Z} Please send this error message along with the
 	${_Y} :    .------.    :  ${_Z} output of running $(cmd ./bug-report.sh) to
@@ -204,11 +209,11 @@ _other_problem_msg() {
 	MSG
 }
 
-# There are four ways connecting to GitLab could fail
+# There are four ways connecting to GitHub could fail
 #  0. No internet|host key verification failed = fix the problem and try again
-#  1. No local SSH keys = create and upload new key to GitLab
-#  2. Local SSH key is not on GitLab = don't re-create, but upload to GitLab
-#  3. Local key exists on GitLab = mark this lesson complete and move on
+#  1. No local SSH keys = create and upload new key to GitHub
+#  2. Local SSH key is not on GitHub = don't re-create, but upload to GitHub
+#  3. Local key exists on GitHub = mark this lesson complete and move on
 #
 # Testing the various modes of failure:
 #
@@ -219,26 +224,38 @@ _other_problem_msg() {
 #
 # The authenticity of host '...' can't be established
 #   Remove host keys with
-#     $ ssh-keygen -R gitlab.cs.usu.edu
+#     $ ssh-keygen -R github.com
 #
-# ssh: connect to host gitlab.cs.usu.edu port 22: Connection timed out
+# ssh: connect to host github.com port 22: Connection timed out
 #   (triggered by blocking the host in iptables:
-#     $ sudo iptables -A OUTPUT -o wlan0 -d gitlab.cs.usu.edu -j DROP
+#     $ sudo iptables -A OUTPUT -o wlan0 -d github.com -j DROP
 #   This command removes that rule
 #     $ sudo iptables -D OUTPUT 1
 _tutr_assert_ssh_connection_is_okay() {
 	[[ -z $DEBUG ]] && clear || set -x
 
-	echo Testing connection to gitlab.cs.usu.edu...
+	echo Testing connection to $_GL...
 	ssh-keygen -F $_GL >/dev/null 2>&1 || _tutr_info _ssh_add_hostkey_msg
 
 	local msg stat
 	msg=$(ssh -o PasswordAuthentication=no -o ConnectTimeout=7 -T git@$_GL 2>&1)
 	stat=$?
 
+	if [[ $_GL =~ "github.com" ]]; then
+		if (( $stat == 1 )); then 
+			stat=0 
+		fi
+		IS_GITHUB=0
+	fi
+
 	case $stat in
 		0)
-			if [[ $msg == *"Welcome to GitLab, @"* ]]; then
+			if (( $IS_GITHUB == 0 )); then 
+				if [[ $msg == *"Hi "* ]]; then
+					_GL_USERNAME=${msg#* }
+					_GL_USERNAME=${_GL_USERNAME%! *}
+				fi
+			elif [[ $msg == *"Welcome to GitHub, @"* ]]; then
 				_GL_USERNAME=${msg##*@}
 				_GL_USERNAME=${_GL_USERNAME:0:-1}
 			fi
@@ -246,7 +263,7 @@ _tutr_assert_ssh_connection_is_okay() {
 		255)
 			if   [[ $msg == *"Permission denied"* ]]; then
 				# This message means the internet is working and
-				# the SSH key is not on GitLab.
+				# the SSH key is not on GitHub.
 				# See if there is a local SSH key
 				if _tutr_ssh_key_is_present; then
 					_tutr_die _ssh_key_exists_msg $REPLY

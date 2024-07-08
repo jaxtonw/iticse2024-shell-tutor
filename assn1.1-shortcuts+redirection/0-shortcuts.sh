@@ -180,7 +180,7 @@ _tutr_install_shortcuts() {
 		if (( $? != 0 )); then
 			cat <<-: | sed -e $'s/.*/\x1b[1;31mTutor\x1b[0m| &/'
 			I was unable to modify '$1'.
-			Please contact erik.falor@usu.edu for support.
+			Please contact jaxton.winder@gmail.com for support.
 			:
 		else
 			_tutr_info echo "Now you can launch a new shell window and try running \'shortcuts\'."

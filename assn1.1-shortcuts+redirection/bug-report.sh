@@ -9,7 +9,7 @@ printf $'\x1b[1;32mTutor\x1b[0m:    \x1b[0;33m  \\_\\  _..._\x1b[0m\n'
 printf $'\x1b[1;32mTutor\x1b[0m:    \x1b[0;33m  (" )(_..._)\x1b[0m    I apologize, this should\n'
 printf $'\x1b[1;32mTutor\x1b[0m:    \x1b[0;33m   ^^  // \\\\\x1b[0m      not have happened.\n'
 printf $'\x1b[1;32mTutor\x1b[0m:\n'
-printf $'\x1b[1;32mTutor\x1b[0m: Tell me all about it in an email to \x1b[1;36merik.falor@usu.edu\x1b[0m.\n'
+printf $'\x1b[1;32mTutor\x1b[0m: Tell me all about it in an email to \x1b[1;36mjaxton.winder@gmail.com\x1b[0m.\n'
 
 cat <<-BUG | sed -e $'s/.*/\x1b[1;32mTutor\x1b[0m: &/'
 In your message please explain:
