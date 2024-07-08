@@ -1519,7 +1519,10 @@ edit_plan_md1_test() {
 	_tutr_file_clean doc/Plan.md && [[ $_COMMIT == $_NEW_COMMIT ]] && return $_CLEAN
 	_tutr_file_unstaged doc/Plan.md && return $_UNSTAGED
 	_tutr_file_staged   doc/Plan.md && return $_STAGED
-	_tutr_branch_ahead && (( REPLY >= 2 )) && return 0
+
+	_tutr_branch_ahead_count
+	local count=$?
+	(( count >= 2 )) && return 0
 
 	return $_ENCOURAGEMENT
 }
@@ -1637,7 +1640,10 @@ edit_signature_md_test() {
 	_tutr_file_clean doc/Signature.md && [[ $_COMMIT == $_NEW_COMMIT ]] && return $_CLEAN
 	_tutr_file_unstaged doc/Signature.md && return $_UNSTAGED
 	_tutr_file_staged   doc/Signature.md && return $_STAGED
-	_tutr_branch_ahead && (( REPLY >= 3 )) && return 0
+
+	_tutr_branch_ahead_count
+	local count=$?
+	(( count >= 3 )) && return 0
 
 	return $_ENCOURAGEMENT
 }

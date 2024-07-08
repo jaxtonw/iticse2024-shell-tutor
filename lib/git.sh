@@ -160,7 +160,6 @@ typeset -r _GB_BEHIND=2
 # Store the number of commits the current branch is ahead/behind in $REPLY
 _git_branch_status() {
 	git status --branch --porcelain=v1 | {
-		echo $SHLVL
 		local stat=0 line
 		while IFS=$'\n' read line; do
 			if [[ $line == "## "*...*/* ]]; then
@@ -185,6 +184,41 @@ _git_branch_status() {
 _tutr_branch_ahead() {
 	_git_branch_status
 	(( $? & _GB_AHEAD ))
+}
+
+# Return the number of commits the current branch is ahead of its remote
+# IMPORTANT!!!
+# 0/non-zero DOES NOT indicate success/failure
+_tutr_branch_ahead_count() {
+    local stat=0
+
+    # `git status` pipes to a curly braced command list because, in Bash,
+    # variable scope behaves differently when piping directly to a `while` loop
+    # when run in an interactive shell vs. a script.
+    #
+    # Somehow, the curly brace makes this OK.
+    # It worked in Zsh without this chicanery.
+    git status --branch --ignored --porcelain=v1 | {
+        while IFS=$'\n' read line; do
+			if [[ $line == "## "*...*/* ]]; then
+				if [[ $line = *ahead* ]]; then
+					stat=$line
+					stat=${stat##* }
+					stat=${stat%']'*}
+					(( stat |= _GB_AHEAD ))
+				elif [[ $line = *behind* ]]; then
+					stat=$line
+					stat=${stat##* }
+					stat=${stat%']'*}
+					(( stat |= _GB_BEHIND ))
+				fi
+				break
+			else
+				break
+			fi
+        done
+        return $stat
+    }
 }
 
 
