@@ -214,12 +214,12 @@ Shell Level 0
   |     
   --- Shell Level 2
     | The shell which the student uses to interact with the lesson. Runs the Shell Tutor 'engine' 
-	| while a user is interacting with a lesson. Performs step validation tasks and executes all 
-	| functions corresponding to a specific lesson step. 
-	| 
-	| The precmd and prexec hooks which the step validation and logging code attach to are within
-	| this shell. Upon completion of a lesson *or* otherwise exiting of this shell, the Shell Tutor
-	| returns to shell level 1 for cleanup tasks.
+    | while a user is interacting with a lesson. Performs step validation tasks and executes all 
+    | functions corresponding to a specific lesson step. 
+    | 
+    | The precmd and prexec hooks which the step validation and logging code attach to are within
+    | this shell. Upon completion of a lesson *or* otherwise exiting of this shell, the Shell Tutor
+    | returns to shell level 1 for cleanup tasks.
 ```
 
 As seen in [Basic Lesson Writing Instructions](#basic-lesson-writing-instructions), we can ensure that select code defined outside of a function is only executed at shell level two by guarding it within an `if [[ -n $_TUTR ]]` block. The example shown above ensures only select engine functionality exists within the Shell Tutor's Level 2 shell. Conversely, if one wants to execute lesson code only in shell level 1, one could guard the code within an `if [[ -z $_TUTR ]]` block.
