@@ -12,14 +12,25 @@ source progress.sh
 
 
 # This assignment's number
-_A=2.1
+_A=1.1
 
 # Name of the starter code repo
-_REPONAME=cs1440-falor-erik-assn$_A
+_REPONAME=cs1440-winder-jaxton-assn$_A
 
 # origin of the starter code repo
-_SSH_REPO_URL=git@gitlab.cs.usu.edu:erik.falor/$_REPONAME
+_SSH_REPO_URL=git@github.com:jaxton/$_REPONAME
 
+# Should be the hostname where students are expected to push to
+_GIT_REMOTE_HOST=github.com
+
+# The instructor's username. Should be contained in the _SSH_REPO_URL 
+_INSTRUCTOR_USERNAME=jaxtonw
+
+# Enforce naming standard. When set to 0 (true), force the repo naming standard of 'cs1440-LAST-FIRST-assn$_A'
+_ENFORCE_NAMING_STANDARD=1
+
+# Used to swap between GitHub/GitLab (or other platforms) dynamically
+_GIT_REMOTE_PLAT=GitHub
 
 if [[ -n $_TUTR ]]; then
 	source generic-error.sh
@@ -32,7 +43,7 @@ if [[ -n $_TUTR ]]; then
 
 	# This function is named `_Git` to avoid clashing with Zsh's `_git`
 	_Git() { (( $# == 0 )) && echo $(blu Git) || echo $(blu $*); }
-	_GitLab() { (( $# == 0 )) && echo $(cyn GitLab) || echo $(cyn $*); }
+	_GitPlat() { (( $# == 0 )) && echo $(cyn $_GIT_REMOTE_PLAT) || echo $(cyn $*); }
 	_local() { (( $# == 0 )) && echo $(ylw local) || echo $(ylw $*); }
 	_remote() { (( $# == 0 )) && echo $(mgn remote) || echo $(mgn $*); }
 	_origin() { (( $# == 0 )) && echo $(red origin) || echo $(red $*); }
@@ -373,29 +384,38 @@ git_remote_add_ff() {
 
 git_remote_add_prologue() {
 	cat <<-:
-	Next, associate $(_origin) with a new GitLab URL that includes your name.
+	Next, associate $(_origin) with a new $(_GitPlat) URL that includes your name.
 
 	Recall that $(_Git) needs this URL to precisely match this pattern:
 	:
+	if [[ $_ENFORCE_NAMING_STANDARD == 0 ]]; then
+		if [[ -n $_GL_USERNAME ]]; then
+			cat <<-:
+			$(path git@${_GIT_REMOTE_HOST}:${_GL_USERNAME}/cs1440-LASTNAME-FIRSTNAME-assn$_A)
+			:
+		else
+			cat <<-:
+			$(path git@${_GIT_REMOTE_HOST}:USERNAME/cs1440-LASTNAME-FIRSTNAME-assn$_A)
 
-	if [[ -n $_GL_USERNAME ]]; then
+			* Replace $(cyn USERNAME) with your $(bld $_GIT_REMOTE_PLAT username)
+				* Your $(bld $_GIT_REMOTE_PLAT username) is most likely your $(bld Student ID)
+				* You can see your username by clicking on your avatar in the
+				upper-right corner of $_GIT_REMOTE_PLAT while logged in.
+			:
+		fi
 		cat <<-:
-		  $(path git@gitlab.cs.usu.edu:${_GL_USERNAME}/cs1440-LASTNAME-FIRSTNAME-assn$_A)
+		* Replace $(cyn LASTNAME-FIRSTNAME) with your $(bld real names)
 		:
 	else
 		cat <<-:
-		  $(path git@gitlab.cs.usu.edu:USERNAME/cs1440-LASTNAME-FIRSTNAME-assn$_A)
+		$(path git@${_GIT_REMOTE_HOST}:${_GL_USERNAME}/PROJECTNAME)
 
-		  * Replace $(cyn USERNAME) with your $(bld GitLab username)
-			* Your $(bld GitLab username) is most likely your $(bld A Number)
-			* You can see your username by clicking on your avatar in the
-			  upper-right corner of GitLab while logged in.
+		* Replace $(cyn PROJECTNAME) with the desired name for your project.
 		:
 	fi
 
 	cat <<-:
-	  * Replace $(cyn LASTNAME-FIRSTNAME) with your $(bld real names)
-
+	
 	Run $(cmd git remote add origin URL) to make this change
 	:
 }
@@ -413,8 +433,8 @@ git_remote_add_test() {
 	fi
 
 	_NO_ORIGIN=99
-	_ERIKS_USERNAME=98
-	_ERIKS_REPONAME=97
+	_IS_INSTRUCTOR_USERNAME=98
+	_INSTRUCTOR_REPONAME=97
 	_BAD_ASSN=96
 	_BAD_USERNAME=95
 	_BAD_SLASH=94
@@ -429,25 +449,42 @@ git_remote_add_test() {
 	if   [[ -z $URL ]]; then return $_NO_ORIGIN
 	elif [[ $URL =  https:* ]]; then return $_HTTPS_URL
 	elif [[ $URL != git@* ]]; then return $_NOT_SSH_URL
-	elif [[ $URL =  git@gitlab.cs.usu.edu/* ]]; then return $_BAD_SLASH
-	elif [[ $URL != *gitlab.cs.usu.edu* ]]; then return $_BAD_HOST
-	elif [[ $URL =  *:erik.falor/* ]]; then return $_ERIKS_USERNAME
-	elif [[ $URL =  *LASTNAME* || $URL =  *FIRSTNAME* ]]; then return $_LASTNAME_FIRSTNAME
-	elif [[ $URL != */cs1440-* ]]; then return $_BAD_COURSE
-	elif [[ $URL != *-assn$_A && $URL != *-assn$_A.git ]]; then return $_BAD_ASSN
-	elif [[ $URL =  */$_REPONAME* ]]; then return $_ERIKS_REPONAME
-	elif [[ $URL = git@gitlab.cs.usu.edu:@* ]]; then return $_AT_SIGN
-	elif [[ -n $_GL_USERNAME ]]; then
-		if [[ $URL = git@gitlab.cs.usu.edu:$_GL_USERNAME/cs1440-*-assn$_A ||
-		      $URL = git@gitlab.cs.usu.edu:$_GL_USERNAME/cs1440-*-assn$_A.git ]]; then
-			return 0
-		elif [[ $URL != git@gitlab.cs.usu.edu:$_GL_USERNAME* ]]; then
-			return $_BAD_USERNAME
+	elif [[ $URL =  git@$_GIT_REMOTE_HOST/* ]]; then return $_BAD_SLASH
+	elif [[ $URL != *$_GIT_REMOTE_HOST* ]]; then return $_BAD_HOST
+	elif [[ $URL =  *:$_INSTRUCTOR_USERNAME/* ]]; then return $_IS_INSTRUCTOR_USERNAME
+	elif [[ $URL =  */$_REPONAME* ]]; then return $_INSTRUCTOR_REPONAME
+	elif [[ $_ENFORCE_NAMING_STANDARD == 0 ]]; then
+		if [[ $URL != */cs1440-* ]]; then return $_BAD_COURSE
+		elif [[ $URL =  *LASTNAME* || $URL =  *FIRSTNAME* ]]; then return $_LASTNAME_FIRSTNAME
+		elif [[ $URL = git@$_GIT_REMOTE_HOST:@* ]]; then return $_AT_SIGN
+		elif [[ $URL != *-assn$_A && 
+				$URL != *-assn$_A.git ]]; then return $_BAD_ASSN
+		fi
+	fi
+
+	if [[ -n $_GL_USERNAME ]]; then
+		if [[ $_ENFORCE_NAMING_STANDARD == 0 ]]; then
+			if [[ $URL = git@$_GIT_REMOTE_HOST:$_GL_USERNAME/cs1440-*-assn$_A ||
+				$URL = git@$_GIT_REMOTE_HOST:$_GL_USERNAME/cs1440-*-assn$_A.git ]]; then
+				return 0
+			elif [[ $URL != git@$_GIT_REMOTE_HOST:$_GL_USERNAME* ]]; then
+				return $_BAD_USERNAME
+			fi
+		else
+			if [[ $URL = git@$_GIT_REMOTE_HOST:$_GL_USERNAME* ]]; then
+				return 0
+			fi
 		fi
 	elif [[ -z $_GL_USERNAME ]]; then
-		if [[ $URL = git@gitlab.cs.usu.edu:*/cs1440-*-assn$_A ||
-		      $URL = git@gitlab.cs.usu.edu:*/cs1440-*-assn$_A.git ]]; then
-		  return 0
+		if [[ $_ENFORCE_NAMING_STANDARD == 0 ]]; then
+			if [[ $URL = git@$_GIT_REMOTE_HOST:*/cs1440-*-assn$_A ||
+				$URL = git@$_GIT_REMOTE_HOST:*/cs1440-*-assn$_A.git ]]; then
+			return 0
+			fi
+		else
+			if [[ $URL = git@$_GIT_REMOTE_HOST:* ]]; then
+				return 0
+			fi
 		fi
 	fi
 	_tutr_generic_test -c git -n -d "$_BASE"
@@ -466,7 +503,7 @@ git_remote_add_hint() {
 			:
 			;;
 
-		$_ERIKS_USERNAME)
+		$_IS_INSTRUCTOR_USERNAME)
 			cat <<-:
 			$(_origin) points to the address of MY repo, not YOURS!
 
@@ -474,15 +511,22 @@ git_remote_add_hint() {
 			:
 			;;
 
-		$_ERIKS_REPONAME)
+		$_INSTRUCTOR_REPONAME)
 			cat <<-:
 			The name you gave your repo is wrong - it still contains MY name.
+			
+			:
 
-			Your repository's name should include YOUR name and look like this:
-			  $(bld cs1440-LASTNAME-FIRSTNAME-assn$_A)
+			if [[ $_ENFORCE_NAMING_STANDARD == 0 ]]; then
+				cat <<-:
+				Your repository's name should include YOUR name and look like this:
+				$(bld cs1440-LASTNAME-FIRSTNAME-assn$_A)
 
-			Also, replace $(cyn LASTNAME-FIRSTNAME) with your $(bld real names)
-
+				Also, replace $(cyn LASTNAME-FIRSTNAME) with your $(bld real names)
+				
+				:
+			fi
+			cat <<-:
 			Use $(cmd git remote remove origin) to erase this and try again.
 			:
 			;;
@@ -491,11 +535,17 @@ git_remote_add_hint() {
 			cat <<-:
 			Somehow I doubt those are your first and last names.
 
-			Your repository's name should include your $(bld real) name and look like this:
-			  $(bld cs1440-LASTNAME-FIRSTNAME-assn$_A)
+			:
+			if [[ $_ENFORCE_NAMING_STANDARD == 0 ]]; then
+				cat <<-:
+				Your repository's name should include your $(bld real) name and look like this:
+				$(bld cs1440-LASTNAME-FIRSTNAME-assn$_A)
 
-			Of course, replace $(cyn LASTNAME-FIRSTNAME) with your $(bld real names).
-
+				Of course, replace $(cyn LASTNAME-FIRSTNAME) with your $(bld real names).
+				
+				:
+			fi
+			cat <<-:
 			Use $(cmd git remote remove origin) to erase it so you can try again.
 			:
 			;;
@@ -507,18 +557,32 @@ git_remote_add_hint() {
 			like this:
 
 			:
-			if [[ -n $_GL_USERNAME ]]; then
-				cat <<-:
-				$(path git@gitlab.cs.usu.edu:$_GL_USERNAME/cs1440-LASTNAME-FIRSTNAME-assn$_A))
-				:
+			if [[ $_ENFORCE_NAMING_STANDARD == 0 ]]; then
+				if [[ -n $_GL_USERNAME ]]; then
+					cat <<-:
+					$(path git@$_GIT_REMOTE_HOST:$_GL_USERNAME/cs1440-LASTNAME-FIRSTNAME-assn$_A))
+					:
+				else
+					cat <<-:
+					$(path git@$_GIT_REMOTE_HOST:USERNAME/cs1440-LASTNAME-FIRSTNAME-assn$_A))
+
+					Of course, replace $(cyn USERNAME) with your $(bld GitLab username).
+					:
+				fi
 			else
-				cat <<-:
-				$(path git@gitlab.cs.usu.edu:USERNAME/cs1440-LASTNAME-FIRSTNAME-assn$_A))
+				if [[ -n $_GL_USERNAME ]]; then
+					cat <<-:
+					$(path git@$_GIT_REMOTE_HOST:$_GL_USERNAME/REPONAME))
+					:
+				else
+					cat <<-:
+					$(path git@$_GIT_REMOTE_HOST:USERNAME/REPONAME))
 
-				Of course, replace $(cyn USERNAME) with your $(bld GitLab username).
-				:
+					Of course, replace $(cyn USERNAME) with your $(bld $_GIT_REMOTE_PLAT username).
+					:
+				fi
+
 			fi
-
 			cat <<-:
 
 			Use $(cmd git remote remove origin) to erase it and start over.
@@ -529,17 +593,29 @@ git_remote_add_hint() {
 			cat <<-:
 			You entered the wrong username into the URL.
 
-			Your GitLab username is $(bld $_GL_USERNAME), so the URL should
+			Your $_GIT_REMOTE_PLAT username is $(bld $_GL_USERNAME), so the URL should
 			look like this:
+			:
 
-			$(path git@gitlab.cs.usu.edu:$_GL_USERNAME/cs1440-LASTNAME-FIRSTNAME-assn$_A))
+			if [[ $_ENFORCE_NAMING_STANDARD == 0 ]]; then
+				cat <<-:
+				$(path git@$_GIT_REMOTE_HOST:$_GL_USERNAME/cs1440-LASTNAME-FIRSTNAME-assn$_A))
 
-			Also, replace $(cyn LASTNAME-FIRSTNAME) with your $(bld real names)
+				Also, replace $(cyn LASTNAME-FIRSTNAME) with your $(bld real names)
 
+				:
+			else
+				cat <<-:
+				$(path git@$_GIT_REMOTE_HOST:$_GL_USERNAME/REPONAME))
+				
+				:
+			fi
+			cat <<-:
 			Use $(cmd git remote remove origin) to erase it and start over.
 			:
 			;;
 
+		# Unreachable if $_ENFORCE_NAMING_STANDARD == 0
 		$_BAD_ASSN)
 			cat <<-:
 			This repository's name must end in $(bld "-assn$_A"), signifying that it
@@ -552,7 +628,7 @@ git_remote_add_hint() {
 		$_BAD_SLASH)
 			cat <<-:
 			This SSH address will not work because there is a slash $(bld "'/'") between the
-			hostname $(ylw gitlab.cs.usu.edu) and your username.  (Use $(cmd git remote -v) to
+			hostname $(ylw $_GIT_REMOTE_HOST) and your username.  (Use $(cmd git remote -v) to
 			see for yourself).
 
 			Instead of a slash that character should be a colon $(bld "':'")
@@ -563,7 +639,7 @@ git_remote_add_hint() {
 
 		$_BAD_HOST)
 			cat <<-:
-			The hostname of the URL should be $(ylw gitlab.cs.usu.edu).
+			The hostname of the URL should be $(ylw $_GIT_REMOTE_HOST).
 
 			If you push your code to the wrong Git server it will not be submitted.
 
@@ -709,7 +785,7 @@ push_certificate_hint() {
 
 		$_BRANCH_AHEAD)
 			cat <<-:
-			Now run $(cmd git push -u origin master) to submit the certificate to $(_GitLab).
+			Now run $(cmd git push -u origin master) to submit the certificate to $(_GitPlat).
 			:
 			;;
 
@@ -735,14 +811,14 @@ push_certificate_epilogue() {
 	if [[ -n ${ARCHIVE[@]} ]]; then
 		cat <<-:
 
-		Before you finish, go look at the repository on $(_GitLab) to make sure the
+		Before you finish, go look at the repository on $(_GitPlat) to make sure the
 		certificate and archive both arrived safely.
 
 		:
 	else
 		cat <<-:
 
-		Before you finish, go look at the repository on $(_GitLab) to make sure your
+		Before you finish, go look at the repository on $(_GitPlat) to make sure your
 		certificate arrived safely.
 
 		:
