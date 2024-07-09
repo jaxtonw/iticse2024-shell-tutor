@@ -10,7 +10,7 @@ source progress.sh
 source stdlib.sh
 
 
-collect_logfiles() {
+compress_logfiles() {
 	local LOG_FILE_DIR="$PWD/.logr/logfiles"
 	local COMPRESSED_FILE_NAME=shell-logs
 
@@ -20,8 +20,7 @@ collect_logfiles() {
 
 			if [[ $? == 0 ]]; then
 				cat <<-:
-
-				I also created the file '$COMPRESSED_FILE_NAME.tgz'
+				This also created the file '$COMPRESSED_FILE_NAME.tgz'
 				It contains information that helps us improve the shell tutor.
 				:
 			else
@@ -38,14 +37,13 @@ collect_logfiles() {
 
 			if [[ $? == 0 ]]; then
 				cat <<-:
-
-				I also created the file '$COMPRESSED_FILE_NAME.zip'
+				This also created the file '$COMPRESSED_FILE_NAME.zip'
 				It contains information that helps us improve the shell tutor.
 				:
 			else
 				cat <<-:
 
-				I was unable to zip up the command logs for you.
+				I was unable to zip up the log files for you.
 				Contact $_EMAIL for help.
 				:
 				return 1
@@ -53,8 +51,7 @@ collect_logfiles() {
 
 		else
 			cat <<-:
-
-			I am unable to collect your command logs.
+			I am unable to compress the log files for you.
 			Contact $_EMAIL for help.
 			:
 			return 1
@@ -125,39 +122,40 @@ validate_completion() {
 congrats() {
 	local USER="$(whoami)"
 	cat <<-':'
-	   _______________________________________________________________________
-	 / \                                                                      \
-	|   |  _____                        __       __     __  _               __|
-	 \_ | / ___/__  ___  ___ ________ _/ /___ __/ /__ _/ /_(_)__  ___  ___ / /|
-	    |/ /__/ _ \/ _ \/ _ `/ __/ _ `/ __/ // / / _ `/ __/ / _ \/ _ \(_-</_/ |
-	    |\___/\___/_//_/\_, /_/  \_,_/\__/\_,_/_/\_,_/\__/_/\___/_//_/___(_)  |
-	    |              /___/                                                  |
-	    |   _.-'`'-._                                           ________      |
-	    |.-'    _    '-.  You completed the shell tutorial!  (`\        `\    |
-	    | `-.__  `\_.-'                                       `-\ DIPLOMA \   |
-	    |   |  `-``\|        I am so proud of you right          \   (@)   \  |
-	    |   `-.....-#        now that ASCII art cannot           _\   |\    \ |
-	    | jgs       #           capture my emotions.            ( _)_________)|
-	    |           #                                            `----------` |
-	    |                                                                     |
-	    |                                                                     |
+	   ___________________________________________________________________________
+	 / \                                                                          \
+	|   |    _____                        __       __     __  _               __  |
+	 \_ |   / ___/__  ___  ___ ________ _/ /___ __/ /__ _/ /_(_)__  ___  ___ / /  |
+	    |  / /__/ _ \/ _ \/ _ `/ __/ _ `/ __/ // / / _ `/ __/ / _ \/ _ \(_-</_/   |
+	    |  \___/\___/_//_/\_, /_/  \_,_/\__/\_,_/_/\_,_/\__/_/\___/_//_/___(_)    |
+	    |              /___/                                                      |
+	    |     _.-'`'-._                                           ________        |
+	    |  .-'    _    '-.  You completed the shell tutorial!  (`\        `\      |
+	    |   `-.__  `\_.-'                                       `-\ DIPLOMA \     |
+	    |     |  `-``\|        I am so proud of you right          \   (@)   \    |
+	    |     `-.....-#        now that ASCII art cannot           _\   |\    \   |
+	    |   jgs       #           capture my emotions.            ( _)_________)  |
+	    |             #                                            `----------`   |
+	    |                                                                         |
+	    |                                                                         |
 	:
 
 	cat <<-:
-	    |      Awarded to: $(printf '%-50.50s' $USER@$HOSTNAME) |
-	    |      Date: $(printf '%-56.56s' "$(command date '+%B %d, %Y')") |
+	    |      Awarded to: $(printf '%-50.50s' $USER@$HOSTNAME)     |
+	    |      Date: $(printf '%-56.56s' "$(command date '+%B %d, %Y')")     |
 	:
 
 	cat <<-':'
-	    |                  __               _____     _                       |
-	    |                 /  `       /       /  '    //                       |
-	    |                /--  __  o /_    ,-/-,__.  // __ __                  |
-	    |      Signed:  (___,/ (_<_/ <_  (_/  (_/|_</_(_)/ (_                 |
-	    |              ---------------------------------------------------    |
-	    |                                                                     |
-	    |   __________________________________________________________________|__
-	    |  /                                                                    /
-	    \_/dc__________________________________________________________________/
+	    |                     _          _   _     ______                         |
+	    |                 () | |        | | | |   (_) |                           |
+	    |                 /\ | |     _  | | | |       |      _|_  __   ,_         |
+	    |                /  \|/ \   |/  |/  |/      _ ||   |  |  /  \_/  |        |
+	    |      Signed:  /(__/|   |_/|__/|__/|__/   (_/  \_/|_/|_/\__/    |_/      |
+	    |              -----------------------------------------------------      |
+	    |                                                                         |
+	    |   ______________________________________________________________________|__
+	    |  /                                                                        /
+	    \_/dc______________________________________________________________________/
 	:
 
 	cat <<-:
@@ -188,7 +186,7 @@ make_certificate() {
 validate_completion
 make_certificate
 congrats
-[[ -z $DISABLE_TUTR_LOGR ]] && collect_logfiles
+[[ -z $DISABLE_TUTR_LOGR ]] && compress_logfiles
 echo
 
 
