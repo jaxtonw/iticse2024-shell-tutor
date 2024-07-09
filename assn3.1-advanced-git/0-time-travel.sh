@@ -16,9 +16,8 @@ if [[ -n $_TUTR ]]; then
 	source noop.sh
 fi
 
-_REPO_NAME=pomodoro
-_REPO_URL_SSH=git@gitlab.cs.usu.edu:duckiecorp/$_REPO_NAME
-_SUGGESTED_REMOTE_REPO_NAME=$_REPO_NAME
+declare -r _REPO_NAME=iticse2024-shell-tutor-pomodoro
+declare -r _REPO_URL_SSH=git@github.com:jaxtonw/$_REPO_NAME
 
 Pomodoro() { (( $# == 0 )) && echo $(red Pomodoro) || echo $(red $*); }
 _Git() { (( $# == 0 )) && echo $(blu Git) || echo $(blu $*); }
@@ -72,6 +71,9 @@ _tutr_lesson_statelog_global() {
 setup() {
 	export _ORIG_PWD="$PWD"
 	export _PARENT="$(cd .. && pwd)"
+	if (cd $_PARENT; git status &>/dev/null); then
+		export _PARENT="$(cd ../.. && pwd)"
+	fi
 	export _REPO_PATH="$_PARENT/$_REPO_NAME"
 
 	source screen-size.sh 80 30
@@ -165,8 +167,9 @@ cd_dotdot_prologue() {
 	cat <<-MSG
 	In this lesson you will clone a small repository to play around in.
 
-	Before you clone it down, $(cmd cd) up one directory to avoid putting
-	the new repository inside this assignment repo.
+	Before you clone it down, $(cmd cd) out of the Shell Tutor's repository.
+
+	I think that the directory $(path ${_PARENT}) would work best.
 	MSG
 }
 

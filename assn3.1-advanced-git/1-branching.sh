@@ -21,8 +21,8 @@ if [[ -n $_TUTR ]]; then
 	source noop.sh
 fi
 
-_REPO_NAME=pomodoro
-_REPO_URL_SSH=git@gitlab.cs.usu.edu:duckiecorp/$_REPO_NAME
+declare -r _REPO_NAME=iticse2024-shell-tutor-pomodoro
+declare -r _REPO_URL_SSH=git@github.com:jaxtonw/$_REPO_NAME
 _SUGGESTED_REMOTE_REPO_NAME=$_REPO_NAME
 
 Pomodoro() { (( $# == 0 )) && echo $(red Pomodoro) || echo $(red $*); }
@@ -235,6 +235,11 @@ setup() {
 	export _ORIG_PWD="$PWD"
 	export _PARENT="$(cd .. && pwd)"
 	export _REPO_PATH="$_PARENT/$_REPO_NAME"
+	if [[ ! -d $_REPO_PATH/.git ]] && (cd $_PARENT; git status &>/dev/null); then
+		export _PARENT="$(cd ../.. && pwd)"
+		export _REPO_PATH="$_PARENT/$_REPO_NAME"
+	fi
+
 
 	source screen-size.sh 80 30
 
@@ -326,7 +331,9 @@ cd_dotdot_prologue() {
 
 	Well, you'll just have to go and get it again.
 
-	$(cmd cd) up a directory so you can clone it back down.
+	$(cmd cd) out of the Shell Tutor's repository so you can clone it down.
+
+	I think that the directory $(path ${_PARENT}) would work best.
 	MSG
 }
 
@@ -431,7 +438,7 @@ cd_into_repo_ff() {
 
 cd_into_repo_prologue() {
 	cat <<-MSG
-	Enter the directory $(path ${_POMODORO_PRESENT+../}$_REPO_NAME)
+	Enter the directory $(path $(_tutr_shortest_path $_REPO_PATH $PWD [echo_result]))
 	MSG
 }
 
