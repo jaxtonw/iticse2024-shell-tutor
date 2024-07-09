@@ -18,7 +18,7 @@ _A=1.1
 _REPONAME=cs1440-winder-jaxton-assn$_A
 
 # origin of the starter code repo
-_SSH_REPO_URL=git@github.com:jaxton/$_REPONAME
+_SSH_REPO_URL=git@github.com:jaxtonw/$_REPONAME
 
 # Should be the hostname where students are expected to push to
 _GIT_REMOTE_HOST=github.com
@@ -415,7 +415,7 @@ git_remote_add_prologue() {
 	fi
 
 	cat <<-:
-	
+
 	Run $(cmd git remote add origin URL) to make this change
 	:
 }
