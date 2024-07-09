@@ -759,30 +759,6 @@ push_certificate_test() {
 	return 0
 }
 
-github_push_prepare_instructions() {
-	local URL=$(git remote get-url origin 2>/dev/null)
-	REPO_NAME=${URL%.git}
-	REPO_NAME=${URL##*/}
-
-	cat <<-:
-	Because you are using GitHub, you must first create the repository online.
-
-	Go to $(path https://github.com/new) and create a repository with the following:
-
-	* Repository name: $(ylw $REPO_NAME)
-	* 'Add a README' is $(bld UNCHECKED)
-	* $(bld NO) repository template
-	* $(bld .gitignore template: None)
-	* $(bld License: None)
-
-	I will open a web browser for you to this page.
-
-	After you have done this, come back to the Shell Tutor, and you may push your work.
-	:
-	_tutr_open 'https://github.com/new'
-
-}
-
 push_certificate_hint() {
 	case $1 in
 		$_UNTRACKED_CERT)
@@ -863,7 +839,7 @@ push_certificate_hint() {
 			:
 			;;
 		$_GITHUB_REPO_NOT_FOUND)
-			github_push_prepare_instructions
+			_tutr_github_push_prepare_instructions
 			;;
 		*)
 			cat <<-:

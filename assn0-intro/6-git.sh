@@ -1895,34 +1895,10 @@ git_push_all_prologue() {
 
 	local URL=$(git remote get-url origin 2>/dev/null)
 	if [[ $URL == *"github.com"* ]]; then
-		github_push_prepare_instructions
+		_tutr_github_push_prepare_instructions
 	fi
 }
 
-github_push_prepare_instructions() {
-	local URL=$(git remote get-url origin 2>/dev/null)
-	REPO_NAME=${URL%.git}
-	REPO_NAME=${URL##*/}
-
-	cat <<-:
-	
-	Because you are using GitHub, you must first create the repository online.
-
-	Go to $(path https://github.com/new) and create a repository with the following:
-
-	* Repository name: $(ylw $REPO_NAME)
-	* 'Add a README' is $(bld UNCHECKED)
-	* $(bld NO) repository template
-	* $(bld .gitignore template: None)
-	* $(bld License: None)
-
-	I will open a web browser for you to this page.
-
-	After you have done this, come back to the Shell Tutor, and you may push your work.
-	:
-	_tutr_open 'https://github.com/new'
-
-}
 git_push_all_test() {
 	_NO_U=99
 	_GH_NOT_CREATED=128
@@ -1988,7 +1964,7 @@ git_push_all_hint() {
 			;;
 
 		$_GH_NOT_CREATED)
-			github_push_prepare_instructions
+			_tutr_github_push_prepare_instructions
 			cat <<-:
 			Setup your repository on GitHub, then run this command to proceed
 			  $(cmd git push -u origin --all)
