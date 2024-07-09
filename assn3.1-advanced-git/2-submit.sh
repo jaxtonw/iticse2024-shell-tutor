@@ -73,7 +73,7 @@ setup() {
 	_tutr_assert_program_exists git
 
 	source ssh-connection-test.sh
-	_tutr_assert_ssh_connection_is_okay
+	[[ $_SIMULATE_GIT != 0 ]] && _tutr_assert_ssh_connection_is_okay
 
 	export _BASE="$PWD"
 }
