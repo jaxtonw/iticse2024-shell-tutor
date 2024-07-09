@@ -32,6 +32,9 @@ _ENFORCE_NAMING_STANDARD=1
 # Used to swap between GitHub/GitLab (or other platforms) dynamically
 _GIT_REMOTE_PLAT=GitHub
 
+# If _SIMULATE_GIT == 0, don't actually add/commit/push cert/logs. Simulates git operations
+_SIMULATE_GIT=0
+
 if [[ -n $_TUTR ]]; then
 	source generic-error.sh
 	source git.sh
@@ -127,6 +130,25 @@ make_certificate_hint() {
 	esac
 }
 
+make_certificate_epilogue() {
+	if [[ $_SIMULATE_GIT == 0 ]]; then
+		cat <<-:
+		I see that you have the $(bld Simulate Git) feature enabled for this lesson, 
+		which tells me that we should skip some key Git operations at this time.
+
+		Normally, I would have you do the following git operations:
+
+		* $(cmd git add) the certificate and archived log files
+		* $(cmd git remote) configuration to setup a repository to submit these files to
+		* $(cmd git push) to push your completed certificate and archived logs
+
+		At this time, we will $(bld NOT) be doing these git operations. However, I want
+		you to know that is what *would* have happened here.
+		:
+		_tutr_pressenter
+	fi
+}
+
 
 
 commit_certificate_ff() {
@@ -182,6 +204,9 @@ commit_certificate_test() {
 	_UNTRACKED_ARCHIVE=94
 	_STAGED_ARCHIVE=93
 	_BRANCH_NOT_AHEAD=92
+
+	[[ $_SIMULATE_GIT == 0 ]] && return 0
+
 	[[ "$PWD" != "$_BASE" ]] && return $WRONG_PWD
 	[[ ! -f "$_BASE/certificate.txt" ]] && return $_MISSING_CERT
 	_tutr_file_untracked certificate.txt && return $_UNTRACKED_CERT
@@ -306,6 +331,8 @@ git_remote_rename_prologue() {
 
 # Ensure that a remote called 'origin' no longer exists
 git_remote_rename_test() {
+
+	[[ $_SIMULATE_GIT == 0 ]] && return 0
 	if   [[ "$PWD" != "$_BASE" ]]; then return $WRONG_PWD
 	elif _tutr_noop; then return $NOOP
 	elif [[ ${_CMD[0]} = git && ${_CMD[1]} = remote && ${_CMD[2]} = -v ]]; then return $NOOP
@@ -422,6 +449,9 @@ git_remote_add_prologue() {
 
 git_remote_add_test() {
 	_WRONG_SUBCOMMAND=95
+
+	[[ $_SIMULATE_GIT == 0 ]] && return 0
+	
 	if   [[ "$PWD" != "$_BASE" ]]; then return $WRONG_PWD
 	elif _tutr_noop; then return $NOOP
 	elif [[ ${_CMD[0]} = git && ${_CMD[1]} = help ]]; then return $NOOP
@@ -725,6 +755,8 @@ push_certificate_test() {
 	_NOT_ORIGIN_MASTER=92
 	_URL_NOT_CONTAIN_USER=91
 	_GITHUB_REPO_NOT_FOUND=90
+
+	[[ $_SIMULATE_GIT == 0 ]] && return 0
 
 	[[ "$PWD" != "$_BASE" ]] && return $WRONG_PWD
 	[[ ! -f "$_BASE/certificate.txt" ]] && return $_MISSING_CERT
