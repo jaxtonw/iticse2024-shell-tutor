@@ -626,7 +626,7 @@ remote_add_test() {
 	elif [[ $URL != git@${_GIT_REMOTE_HOST}* ]]; then return $URL_NOT_GITLAB
 	elif [[ $URL == git@${_GIT_REMOTE_HOST}/* ]]; then return $URL_MISPLACED_SLASH
 	elif [[ $URL =~ ^git@${_GIT_REMOTE_HOST}:?$ ]]; then return $URL_NO_USER
-	elif [[ $URL == git@${_GIT_REMOTE_HOST}:${_INSTRUCTOR_USERNAME}* ]]; then return $URL_USER_IS_INSTRUCTOR
+	elif [[ $URL == git@${_GIT_REMOTE_HOST}:${_INSTRUCTOR_USERNAME}/* ]]; then return $URL_USER_IS_INSTRUCTOR
 	elif [[ $URL =~ ^git@${_GIT_REMOTE_HOST}:[^/]+/?$ ]]; then return $URL_NO_PROJECT
 	elif [[ ! $URL =~ ^git@${_GIT_REMOTE_HOST}:${_GL_USERNAME}/[^/]+$ ]]; then return $URL_WRONG_USER
 	elif [[ $_ENFORCE_NAMING_STANDARD == 0 &&

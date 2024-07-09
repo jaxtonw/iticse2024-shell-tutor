@@ -266,7 +266,7 @@ tutor() {
             ;;
 
         next)
-            if (( _I < _MAX_STEP )); then
+            if (( _I <= _MAX_STEP )); then
                 _invalidation_prompt || return
                 _tutr_fastfwd || _tutr_die echo "Failed to fast-forward to step $_I. ${_STEPS[$_I]}"
                 _tutr_next_step $((_I + 1))
