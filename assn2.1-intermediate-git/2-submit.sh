@@ -714,6 +714,7 @@ push_certificate_prologue() {
 	:
 }
 
+
 push_certificate_test() {
 	_UNTRACKED_CERT=99
 	_STAGED_CERT=98
@@ -722,6 +723,10 @@ push_certificate_test() {
 	_MISSING_ARCHIVE=95
 	_UNTRACKED_ARCHIVE=94
 	_STAGED_ARCHIVE=93
+	_NOT_ORIGIN_MASTER=92
+	_URL_NOT_CONTAIN_USER=91
+	_GITHUB_REPO_NOT_FOUND=90
+
 	[[ "$PWD" != "$_BASE" ]] && return $WRONG_PWD
 	[[ ! -f "$_BASE/certificate.txt" ]] && return $_MISSING_CERT
 	_tutr_file_untracked certificate.txt && return $_UNTRACKED_CERT
@@ -731,8 +736,52 @@ push_certificate_test() {
 		_tutr_file_staged ${ARCHIVE[0]} && return $_STAGED_ARCHIVE
 	fi
 	_tutr_file_staged certificate.txt && return $_STAGED_CERT
+
+	# Push failed...
+	if [[ ${_CMD[0]} == "git" && ${_CMD[1]} == "push" && $_RES != 0 ]]; then
+		# Cannot guarantee 'origin' and 'master' existed
+		if (( ${#_CMD[@]} < 4 )); then
+			return $_NOT_ORIGIN_MASTER
+		fi
+
+		local URL=$(git remote get-url origin 2>/dev/null)
+		# Possible username error
+		if [[ -n $_GL_USERNAME && $URL != *:$_GL_USERNAME/* ]]; then
+			return $_URL_NOT_CONTAIN_USER
+		fi
+
+		# Nothing seems to be malformed with the command or username
+		# So we assume the error is that the repo is not created on GitHub
+		if [[ $URL = *github.com* ]]; then
+			return $_GITHUB_REPO_NOT_FOUND
+		fi
+	fi
 	_tutr_branch_ahead && return $_BRANCH_AHEAD
 	return 0
+}
+
+github_push_prepare_instructions() {
+	local URL=$(git remote get-url origin 2>/dev/null)
+	REPO_NAME=${URL%.git}
+	REPO_NAME=${URL##*/}
+
+	cat <<-:
+	Because you are using GitHub, you must first create the repository online.
+
+	Go to $(path https://github.com/new) and create a repository with the following:
+
+	* Repository name: $(ylw $REPO_NAME)
+	* 'Add a README' is $(bld UNCHECKED)
+	* $(bld NO) repository template
+	* $(bld .gitignore template: None)
+	* $(bld License: None)
+
+	I will open a web browser for you to this page.
+
+	After you have done this, come back to the Shell Tutor, and you may push your work.
+	:
+	_tutr_open 'https://github.com/new'
+
 }
 
 push_certificate_hint() {
@@ -793,6 +842,30 @@ push_certificate_hint() {
 			_tutr_minimal_chdir_hint "$_BASE"
 			;;
 
+		$_NOT_ORIGIN_MASTER)
+			cat <<-:
+			Did you ensure that you pushed the $(cmd master) branch to the $(cmd origin) remote?
+
+			Now run $(cmd git push -u origin master) to submit the certificate to $(_GitPlat).
+			:
+			;;
+		$_URL_NOT_CONTAIN_USER)
+			cat <<-:
+			It looks like your $(cmd origin) URL does not contain your username that I expected.
+
+			I thought we setup your $(cmd origin) remote correctly in the last step...
+
+			I have tracked that your username is $(bld ${_GL_USERNAME:-ERROR_USERNAME_NOT_FOUND})
+
+			Check the configured URL for your origin remote by running the following:
+			  $(cmd git remote -v)
+
+			You can fix this with $(cmd git remote remove origin) and $(cmd git remote add origin [CORRECT_URL])
+			:
+			;;
+		$_GITHUB_REPO_NOT_FOUND)
+			github_push_prepare_instructions
+			;;
 		*)
 			cat <<-:
 			As a reminder, the steps of your $(_Git) workflow are
