@@ -19,7 +19,7 @@ fi
 
 declare -r _REPO_NAME=iticse2024-shell-tutor-tags
 declare -r _REPO_URL_SSH=git@github.com:jaxtonw/$_REPO_NAME
-declare -r _SUGGESTED_REMOTE_REPO_NAME=$_REPO_NAME
+declare -r _SUGGESTED_REMOTE_REPO_NAME=tags-example
 declare -r _INSTRUCTOR_USERNAME=jaxtonw
 declare -r _GIT_REMOTE_PLAT=GitHub
 declare -r _GIT_REMOTE_HOST=github.com
