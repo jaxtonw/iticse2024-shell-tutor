@@ -17,15 +17,20 @@ if [[ -n $_TUTR ]]; then
 	source platform.sh
 fi
 
-declare -r _REPO_NAME=tags
-declare -r _REPO_URL_SSH=git@gitlab.cs.usu.edu:duckiecorp/$_REPO_NAME
+declare -r _REPO_NAME=iticse2024-shell-tutor-tags
+declare -r _REPO_URL_SSH=git@github.com:jaxtonw/$_REPO_NAME
 declare -r _SUGGESTED_REMOTE_REPO_NAME=$_REPO_NAME
-
+declare -r _INSTRUCTOR_USERNAME=jaxtonw
+declare -r _GIT_REMOTE_PLAT=GitHub
+declare -r _GIT_REMOTE_HOST=github.com
+# If enforce naming standard == 0, enforce duckiecorp repository naming standards for projects
+declare -r _ENFORCE_NAMING_STANDARD=1
 
 DuckieCorp()   { echo ${_Y}DuckieCorp${_z} ; }
 _local()       { (( $# == 0 )) && echo $(ylw local)        || echo $(ylw $*); }
 _origin()      { (( $# == 0 )) && echo $(red origin)       || echo $(red $*); }
 _md()          { (( $# == 0 )) && echo $(blu MARKDOWN)     || echo $(blu $*) ; }
+_GitPlat()     { (( $# == 0 )) && echo $(cyn $_GIT_REMOTE_PLAT) || echo $(cyn $*); }
 
 
 
@@ -41,7 +46,7 @@ repo_warning() {
 	${_Y} /     (_)     \  ${_Z} or rename it with the $(cmd mv) command.
 	${_Y}/_______________\ ${_Z}
 
-	This repository will also be present on your GitLab account.
+	This repository will also be present on your $(_GitPlat) account.
 	Later in this lesson you will be asked to choose a name for this
 	remote repository.  Choose something unique to avoid a clash.
 	MSG
@@ -82,6 +87,9 @@ append_ls_remote_to_statelog() {
 setup() {
 	export _ORIG_PWD="$PWD"
 	export _PARENT="$(cd .. && pwd)"
+	if (cd $_PARENT; git status &>/dev/null); then
+		export _PARENT="$(cd ../.. && pwd)"
+	fi
 	export _REPO_PATH="$_PARENT/$_REPO_NAME"
 	# Check if repo for lesson already exists
 	if [[ -d "$_REPO_PATH/.git" ]]; then
@@ -157,8 +165,10 @@ cd_dotdot_prologue() {
 	cat <<-MSG
 	In this lesson you will clone a small repository to play around in.
 
-	Before you clone it down, $(cmd cd) up one directory to avoid putting the
+	Before you clone it down, $(cmd cd) out of this directory to avoid putting the
 	new repository inside this assignment repo.
+
+	I think that the directory $(path ${_PARENT}) would work best.
 	MSG
 }
 
@@ -406,8 +416,8 @@ remote_rename_prologue() {
 	cat <<-MSG
 	Tags are going to become an important part of your workflow in
 	assignments going forward.  In this lesson you will practice creating
-	them and pushing them to my GitLab server.  You need to change this
-	repository's remote URL to point to your account on GitLab.
+	them and pushing them to $(_GitPlat).  You need to change this
+	repository's remote URL to point to your account on $(_GitPlat).
 
 	Just like previous assignments, the first step is to rename the $(_origin)
 	remote to $(_origin old-origin).
@@ -507,14 +517,14 @@ remote_add_prologue() {
 	cat <<-MSG
 	Now you can add a new $(_origin) URL.  I'm not going to be very strict
 	about the URL you use, so long as it is linked to $(wht your) account
-	on GitLab.
+	on $(_GitPlat).
 
 	Construct the URL like this:
 
-	  git@gitlab.cs.usu.edu:$(mgn "<your_gitlab_username>")/$(cyn "<repository_name>")
+	  git@${_GIT_REMOTE_HOST}:$(mgn "<your_${_GIT_REMOTE_PLAT}_username>")/$(cyn "<repository_name>")
 
-	Replace $(mgn "<your_gitlab_username>") with your GitLab username,
-	i.e., the name you see in the address bar after you log on to GitLab.
+	Replace $(mgn "<your_${_GIT_REMOTE_PLAT}_username>") with your $(_GitPlat) username,
+	i.e., the name you see in the address bar after you log on to $(_GitPlat).
 
 	$(cyn "<repository_name>") should be descriptive, and something that won't
 	clash with your assignment repositories.  Might I suggest $(wht "'$_SUGGESTED_REMOTE_REPO_NAME'")?
@@ -535,8 +545,7 @@ remote_add_test() {
 	URL_NOT_GITLAB=95
 	URL_MISPLACED_SLASH=94
 	URL_NO_USER=93
-	URL_USER_IS_ERIK=92
-	URL_USER_IS_DUCKIECORP=91
+	URL_USER_IS_INSTRUCTOR=92
 	URL_NO_PROJECT=90
 	URL_BAD_PROJECT=89
 	URL_WRONG_USER=88
@@ -556,15 +565,14 @@ remote_add_test() {
 	local URL=$(git remote get-url origin 2>/dev/null)
 	if   [[ -z $URL ]]; then return $NO_ORIGIN_URL
 	elif [[ $URL != git@* ]]; then return $URL_SCHEME_WRONG
-	elif [[ $URL != git@gitlab.cs.usu.edu* ]]; then return $URL_NOT_GITLAB
-	elif [[ $URL == git@gitlab.cs.usu.edu/* ]]; then return $URL_MISPLACED_SLASH
-	elif [[ $URL =~ ^git@gitlab.cs.usu.edu:?$ ]]; then return $URL_NO_USER
-	elif [[ $URL == git@gitlab.cs.usu.edu:erik.falor* ]]; then return $URL_USER_IS_ERIK
-	elif [[ $URL == git@gitlab.cs.usu.edu:duckiecorp* ]]; then return $URL_USER_IS_DUCKIECORP
-	elif [[ $URL =~ ^git@gitlab.cs.usu.edu:[^/]+/?$ ]]; then return $URL_NO_PROJECT
-	elif [[ ! $URL =~ ^git@gitlab.cs.usu.edu:${_GL_USERNAME}/[^/]+$ ]]; then return $URL_WRONG_USER
-	elif [[ $URL == git@gitlab.cs.usu.edu:$_GL_USERNAME/cs1440-*-assn* ]]; then return $URL_BAD_PROJECT
-	elif [[ $URL =~ ^git@gitlab.cs.usu.edu:${_GL_USERNAME}/[^/]+$ ]]; then return 0
+	elif [[ $URL != git@${_GIT_REMOTE_HOST}* ]]; then return $URL_NOT_GITLAB
+	elif [[ $URL == git@${_GIT_REMOTE_HOST}/* ]]; then return $URL_MISPLACED_SLASH
+	elif [[ $URL =~ ^git@${_GIT_REMOTE_HOST}:?$ ]]; then return $URL_NO_USER
+	elif [[ $URL == git@${_GIT_REMOTE_HOST}:${_INSTRUCTOR_USERNAME}* ]]; then return $URL_USER_IS_INSTRUCTOR
+	elif [[ $URL =~ ^git@${_GIT_REMOTE_HOST}:[^/]+/?$ ]]; then return $URL_NO_PROJECT
+	elif [[ ! $URL =~ ^git@${_GIT_REMOTE_HOST}:${_GL_USERNAME}/[^/]+$ ]]; then return $URL_WRONG_USER
+	elif [[ $_ENFORCE_NAMING_STANDARD == 0 && $URL == git@${_GIT_REMOTE_HOST}:$_GL_USERNAME/cs1440-*-assn* ]]; then return $URL_BAD_PROJECT
+	elif [[ $URL =~ ^git@${_GIT_REMOTE_HOST}:${_GL_USERNAME}/[^/]+$ ]]; then return 0
 	else _tutr_generic_test -c git -n -d "$_REPO_PATH"
 	fi
 }
@@ -608,7 +616,7 @@ remote_add_hint() {
 
 		$URL_NOT_GITLAB)
 			cat <<-MSG
-			The hostname of the URL should be $(bld gitlab.cs.usu.edu).
+			The hostname of the URL should be $(bld ${_GIT_REMOTE_HOST}).
 
 			If you push your code to the wrong Git server it will not be submitted.
 
@@ -619,7 +627,7 @@ remote_add_hint() {
 		$URL_MISPLACED_SLASH)
 			cat <<-MSG
 			This SSH address will not work because there is a slash $(kbd /) between the
-			hostname $(bld gitlab.cs.usu.edu) and your username.  (Use $(cmd git remote -v) to
+			hostname $(bld ${_GIT_REMOTE_HOST}) and your username.  (Use $(cmd git remote -v) to
 			see for yourself).
 
 			Instead of a slash that character should be a colon $(kbd :)
@@ -633,26 +641,16 @@ remote_add_hint() {
 			The URL must contain your username, $(mgn $_GL_USERNAME), separated from the
 			hostname by a colon $(kbd :).  Following that comes the project name (such as
 			$_REPO_NAME).  All together, it will look like this:
-			  $(cyn git@gitlab.cs.usu.edu:$_GL_USERNAME/$_REPO_NAME)
+			  $(cyn git@${_GIT_REMOTE_HOST}:$_GL_USERNAME/$_REPO_NAME)
 
 			Use $(cmd git remote remove origin) to erase it and try again.
 			MSG
 			;;
 
-		$URL_USER_IS_ERIK)
+		$URL_USER_IS_INSTRUCTOR)
 			cat <<-MSG
 			$(_origin) points to the address of MY repo, not YOURS! The
-			$(mgn "<gitlab_username>") portion of the URL is $(mgn erik.falor) when it should
-			be replaced with $(mgn $_GL_USERNAME).
-
-			Use $(cmd git remote remove origin) to erase it and try again.
-			MSG
-			;;
-
-		$URL_USER_IS_DUCKIECORP)
-			cat <<-MSG
-			$(_origin) points to the address of the $(DuckieCorp) repo, not YOURS! The
-			$(mgn "<gitlab_username>") portion of the URL is $(mgn duckiecorp) when it should
+			$(mgn "<${_GIT_REMOTE_HOST}_username>") portion of the URL is $(mgn ${_INSTRUCTOR_USERNAME}) when it should
 			be replaced with $(mgn $_GL_USERNAME).
 
 			Use $(cmd git remote remove origin) to erase it and try again.
@@ -661,8 +659,8 @@ remote_add_hint() {
 
 		$URL_WRONG_USER)
 			cat <<-MSG
-			The $(_origin) URL needs to contain your GitLab username, like this:
-			  $(cyn git@gitlab.cs.usu.edu:$_GL_USERNAME/$_REPO_NAME)
+			The $(_origin) URL needs to contain your $(_GitPlat) username, like this:
+			  $(cyn git@${_GIT_REMOTE_HOST}:$_GL_USERNAME/$_REPO_NAME)
 
 			Use $(cmd git remote remove origin) to erase it and try again.
 			MSG
@@ -675,7 +673,7 @@ remote_add_hint() {
 			so long as there isn't already an existing project by that name.
 
 			May I suggest $(wht $_REPO_NAME)?  The complete URL would then be:
-			  $(cyn git@gitlab.cs.usu.edu:$_GL_USERNAME/$_REPO_NAME)
+			  $(cyn git@${_GIT_REMOTE_HOST}:$_GL_USERNAME/$_REPO_NAME)
 
 			Use $(cmd git remote remove origin) to erase it and try again.
 			MSG
@@ -687,7 +685,7 @@ remote_add_hint() {
 			shouldn't give it that name.  Trust me, it'll only cause trouble later.
 
 			May I suggest $(wht $_REPO_NAME)?  The complete URL would then be:
-			  $(cyn git@gitlab.cs.usu.edu:$_GL_USERNAME/$_REPO_NAME)
+			  $(cyn git@${_GIT_REMOTE_HOST}:$_GL_USERNAME/$_REPO_NAME)
 
 			Use $(cmd git remote remove origin) to erase it and try again.
 			MSG
@@ -710,7 +708,7 @@ remote_add_epilogue() {
 	if [[ "$(git remote -v 2>/dev/null | command grep origin)" == *"https://"* ]]; then
 		cat <<-MSG
 		You set up your repository with an HTTPS URL.  This will work, but isn't
-		ideal. Just a heads up, you will be asked for your GitLab credentials
+		ideal. Just a heads up, you will be asked for your $(_GitPlat) credentials
 		frequently during the lesson because of it.
 
 		MSG
@@ -746,6 +744,9 @@ push_repo_prologue() {
 push_repo_test() {
 	COMMAND_FAILED=98
 	INTERNAL_API_ERROR=97
+	_NOT_ORIGIN_MASTER=96
+	_GITHUB_REPO_NOT_FOUND=95
+
 
 	[[ "$PWD" != "$_REPO_PATH"* ]] && return $WRONG_PWD
 	if   [[ ${_CMD[*]} == "git remote"* ]]; then return $NOOP
@@ -756,7 +757,23 @@ push_repo_test() {
 	elif [[ ${_CMD[*]} == "git push"* ]]; then
 		case $_RES in
 			0) : ;;  # git push succeeded
-			128) return $INTERNAL_API_ERROR ;;
+			128)
+				# Cannot guarantee 'origin' and 'master' existed in cmd
+				if (( ${#_CMD[@]} < 4 )); then
+					return $_NOT_ORIGIN_MASTER
+				fi
+
+
+				local URL=$(git remote get-url origin 2>/dev/null)
+
+				# Nothing seems to be malformed with the command or username
+				# So we assume the error is that the repo is not created on GitHub
+				if [[ $URL = *github.com* ]]; then
+					return $_GITHUB_REPO_NOT_FOUND
+				fi
+
+				return $INTERNAL_API_ERROR 
+				;;
 			*)   return $COMMAND_FAILED ;;
 		esac
 	fi
@@ -775,7 +792,16 @@ push_repo_hint() {
 			If you are stuck here, contact $_EMAIL for assistance.
 			MSG
 			;;
+		$_NOT_ORIGIN_MASTER)
+			cat <<-:
+			Did you ensure that you pushed the $(cmd master) branch to the $(cmd origin) remote?
 
+			Now run $(cmd git push -u origin master) to submit the certificate to $(_GitPlat).
+			:
+			;;
+		$_GITHUB_REPO_NOT_FOUND)
+			_tutr_github_push_prepare_instructions
+			;;
 		$INTERNAL_API_ERROR)
 			cat <<-MSG
 			If you see this message, wait a few minutes before trying again:
@@ -786,8 +812,15 @@ push_repo_hint() {
 
 			========================
 
-			If you got a different message, contact $_EMAIL for assistance,
-			and copy and paste the error text in your email.
+			If you got a different message, ensure your remote repository is configured
+			correctly.
+			
+			You can check this with the command:
+			  $(cmd git remote -v)
+			
+			If your remote repository is correct, and $(_GitHost) seems to be online at
+			this moment, contact $_EMAIL for assistance, and copy and paste the 
+			error text in your email.
 			MSG
 			;;
 
@@ -811,7 +844,7 @@ push_repo_hint() {
 push_repo_epilogue() {
 	cat <<-MSG
 
-	${_Y}      _         ${_Z} Your repository is now on GitLab!
+	${_Y}      _         ${_Z} Your repository is now on $(_GitPlat)!
 	${_Y}     /(|        ${_Z}
 	${_Y}    (  :        ${_Z} I'm opening this repo's home page in your web
 	${_Y}  ___\  \  _____${_Z} browser so you can see what it looks like.
@@ -821,7 +854,7 @@ push_repo_epilogue() {
 	${_Y}  (___)__.|_____${_Z} $(bld 3 Commits  1 Branch  0 Tags  2 KiB Project Storage)
 
 	Pay close attention to $(bld 0 Tags).  $(bld git log) just said that there is a
-	tag called $(ylw final).  But why isn't it on GitLab?
+	tag called $(ylw final).  But why isn't it on $(_GitPlat)?
 	MSG
 
 	browse_to_repo
@@ -894,7 +927,7 @@ push_tag_1st_time_hint() {
 
 push_tag_1st_time_epilogue() {
 	cat <<-MSG
-	Great work!  The tag $(ylw final) is now visible on GitLab.
+	Great work!  The tag $(ylw final) is now visible on $(_GitPlat).
 	Switch back to your browser and refresh the page to see for yourself.
 
 	If you already closed that tab, run $(cmd browse_to_repo) to open it again.
@@ -1306,7 +1339,7 @@ warn_about_https_prompts() {
 	remote to verify things were done correctly. It appears you used an
 	HTTPS URL instead of an SSH URL to connect your.  This is going
 	to result in you getting prompted to input your username and password
-	for GitLab at various points during this step. This is normal
+	for $(_GitPlat) at various points during this step. This is normal
 	behavior, despite being a bit annoying.
 
 	I would highly recommend using SSH URL's for your git remotes in the
@@ -1332,7 +1365,7 @@ push_all_tags_pre() {
 
 push_all_tags_prologue() {
 	cat <<-MSG
-	Now you will push both tags up to GitLab.
+	Now you will push both tags up to $(_GitPlat).
 
 	You can push each tag individually, like this:
 	  $(cmd git push origin test0)
@@ -1379,7 +1412,7 @@ push_all_tags_test() {
 		if [[ -n $TEST0_REF && -n $TEST1_REF ]]; then
 			if [[ $TEST0_REF == ${_COMMITS_L[0]} &&
 				  $TEST1_REF == ${_COMMITS_L[1]} ]]; then
-				# Both tags are on gitlab and on the correct commits! Woo!
+				# Both tags are on $(_GitPlat) and on the correct commits! Woo!
 				return 0
 			else
 				return $ON_WRONG_COMMIT
@@ -1397,8 +1430,8 @@ push_all_tags_hint() {
 			;;
 		$AT_LEAST_ONE_TAG_NOT_PUSHED)
 			cat <<-MSG
-			One (or both) tags are not pushed to GitLab.  Be sure to push both
-			tags to GitLab!
+			One (or both) tags are not pushed to $(_GitPlat).  Be sure to push both
+			tags to $(_GitPlat)!
 			MSG
 			;;
 
@@ -1429,7 +1462,7 @@ push_all_tags_hint() {
 
 push_all_tags_epilogue() {
 	cat <<-MSG
-	Great work!  Your new tags are now on GitLab.
+	Great work!  Your new tags are now on $(_GitPlat).
 
 	Refresh your browser window (or run $(bld browse_to_repo)) to see them.
 
@@ -1765,7 +1798,7 @@ push_final_tag_fail_pre() {
 
 push_final_tag_fail_prologue() {
 	cat <<-MSG
-	Now you can push $(ylw final) back up to GitLab the same way as before.
+	Now you can push $(ylw final) back up to $(_GitPlat) the same way as before.
 	MSG
 }
 
@@ -1960,8 +1993,15 @@ push_delete_tag_hint() {
 
 			========================
 
-			If you got a different message, contact $_EMAIL for assistance,
-			and copy and paste the error text in your email.
+			If you got a different message, ensure your remote repository is configured
+			correctly.
+			
+			You can check this with the command:
+			  $(cmd git remote -v)
+			
+			If your remote repository is correct, and $(_GitHost) seems to be online at
+			this moment, contact $_EMAIL for assistance, and copy and paste the 
+			error text in your email.
 			MSG
 			;;
 
@@ -1990,7 +2030,7 @@ push_delete_tag_epilogue() {
 
 push_final_tag_success_prologue() {
 	cat <<-MSG
-	At last, you can push $(ylw final) up to GitLab.
+	At last, you can push $(ylw final) up to $(_GitPlat).
 	MSG
 }
 
@@ -2044,7 +2084,7 @@ push_final_tag_success_hint() {
 			${_y}   ,; ,'.---,\\  ;,     ${_Z}
 			${_y} ,;   | |   | |   ;,   ${_Z}I'm not sure how this happened, but $(ylw final)
 			${_y}<    ,| |,  | |     >  ${_Z}needs to be replaced on the remote repo.  First,
-			${_y} ';   \\ /   | |   ;'   ${_Z}delete it on GitLab with $(cmd git push -d origin final)
+			${_y} ';   \\ /   | |   ;'   ${_Z}delete it on $(_GitPlat) with $(cmd git push -d origin final)
 			${_y}   ';  V    |_| ;'     ${_Z}
 			${_y}     ';       ;'       ${_Z}Then delete it $(_local locally): $(cmd git tag -d final)
 			${_y}       ';   ;'         ${_Z}
@@ -2067,7 +2107,7 @@ push_final_tag_success_hint() {
 
 push_final_tag_success_epilogue() {
 	cat <<-MSG
-	Great work!  Your $(ylw final) tag is updated on GitLab.
+	Great work!  Your $(ylw final) tag is updated on $(_GitPlat).
 
 	Run $(cmd browse_to_repo) to see it in your browser.
 
@@ -2082,7 +2122,7 @@ push_final_commit_prologue() {
 	As you check out your remote repository in the browser, you should notice
 	that something is missing... that new commit you just made!
 
-	By default, GitLab shows the latest commit $(bld on the default branch),
+	By default, $(_GitPlat) shows the latest commit $(bld on the default branch),
 	which is called $(grn master).  You only told Git to push the $(ylw final) tag, so the
 	$(_origin origin remote) hasn't updated its own $(grn master) branch to match yours.
 
@@ -2094,7 +2134,7 @@ push_final_commit_prologue() {
 	Because you didn't $(bld explicitly) push $(grn master), it is not updated.
 
 	You can fix this with either $(cmd git push) or $(cmd git push origin master).
-	This will send your $(grn master) branch to GitLab, including your last commit.
+	This will send your $(grn master) branch to $(_GitPlat), including your last commit.
 	MSG
 }
 
@@ -2150,7 +2190,7 @@ epilogue() {
 	* Manage tags on remote repositories
 
 	FYI, the $(path $_REPO_NAME) repository that you cloned in this lesson will now
-	be erased from your computer.  It is still on your account on GitLab.
+	be erased from your computer.  It is still on your account on $(_GitPlat).
 
 	EPILOGUE
 	_tutr_pressenter

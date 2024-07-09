@@ -447,5 +447,40 @@ _tutr_git_default_text_statelog() {
 	# the operation happen here :/
 }
 
+_tutr_github_push_prepare_instructions() {
+	local URL=$(git remote get-url origin 2>/dev/null)
+	if [[ -z $URL ]]; then
+		cat <<-:
+		I cannot get the URL for your $(cmd origin) remote...
+		
+		I do not know what to do here, and can not give you you specific advice at this 
+		time. 
+
+		Make sure your $(cmd origin) remote is configured correctly and try again.
+		:
+		return
+	fi
+
+	REPO_NAME=${URL%.git}
+	REPO_NAME=${URL##*/}
+
+	cat <<-:
+	Because you are using GitHub, you must first create the repository online.
+
+	Go to $(path https://github.com/new) and create a repository with the following:
+
+	* Repository name: $(ylw ${REPO_NAME:-Configured Origin Repo Name})
+	* 'Add a README' is $(bld UNCHECKED)
+	* $(bld NO) repository template
+	* $(bld .gitignore template: None)
+	* $(bld License: None)
+
+	I will open a web browser for you to this page.
+
+	After you have done this, come back to the Shell Tutor, and you may push your work.
+	:
+	_tutr_open 'https://github.com/new'
+}
+
 
 # vim: set filetype=sh noexpandtab tabstop=4 shiftwidth=4 textwidth=76 colorcolumn=76:
