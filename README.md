@@ -36,6 +36,8 @@ Alternatively, you may bypass the tutorial executable by setting the lesson as a
 *   `chmod +x 2-files.sh`
 *   `./2-files.sh`
 
+Some of the provided lessons may depend on an earlier lesson. For example, `assn0-intro/7-workflow.sh` requires a repository created and configured in `assn0-intro/6-git.sh`.
+
 
 ## Special Instructions For **macOS** Users
 
