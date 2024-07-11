@@ -24,6 +24,19 @@ $ cd assn0-intro
 $ ./tutorial.sh
 ```
 
+## Running A Specific Lesson
+
+If you would desire to run a specific lesson within an assignment without doing the prior lessons, you may set the `MENU` variable to the lesson number when starting the `tutorial.sh` executable. For example, to run lesson `2-files.sh` in `assn0-intro`, do the following:
+
+*   `cd` into `assn0-intro`
+*   Start the lesson with the command `MENU=2 ./tutorial.sh`
+
+Alternatively, you may bypass the tutorial executable by setting the lesson as an executable with `chmod +x <LESSON_FILE>` and then directly executing the lesson.
+
+*   `chmod +x 2-files.sh`
+*   `./2-files.sh`
+
+
 ## Special Instructions For **macOS** Users
 
 ### How to open the Terminal app
